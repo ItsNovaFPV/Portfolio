@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Teaching Philosophy | Aaron Battle</title>
+	<link rel="icon" href="./favicon.ico" sizes="any" />
+	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+	<link rel="manifest" href="./site.webmanifest" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet" />
+	<style>
+		:root {
+			color-scheme: dark;
+			--bg: #06070b;
+			--text-main: #f3f5ff;
+			--text-muted: #9aa4c2;
+			--accent: #7b8cff;
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			min-height: 100vh;
+			font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			background: radial-gradient(circle at 20% 10%, #10172a 0%, var(--bg) 52%);
+			color: var(--text-main);
+		}
+
+		header.topbar {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 10;
+			padding: 1.35rem 2rem;
+			backdrop-filter: blur(6px);
+		}
+
+		.topbar-inner {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 3.6rem;
+		}
+
+		.name {
+			font-size: clamp(1.1rem, 3.5vw, 1.9rem);
+			font-weight: 800;
+			letter-spacing: -0.02em;
+			text-align: center;
+			white-space: nowrap;
+			order: 1;
+		}
+
+		.menu {
+			display: flex;
+			gap: 1.2rem;
+			align-items: center;
+		}
+
+		.menu-left {
+			order: 0;
+		}
+
+		.menu-right {
+			order: 2;
+			flex-wrap: wrap;
+		}
+
+		.nav-link {
+			text-decoration: none;
+			color: var(--text-main);
+			font-weight: 500;
+			font-size: 0.95rem;
+			letter-spacing: 0.01em;
+			position: relative;
+			padding-bottom: 0.15rem;
+			transition: color 160ms ease;
+			white-space: nowrap;
+			min-width: 140px;
+			text-align: center;
+			cursor: pointer;
+		}
+
+		.nav-link::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			bottom: -0.2rem;
+			width: 100%;
+			height: 1.5px;
+			background: linear-gradient(90deg, var(--accent), rgba(123, 140, 255, 0));
+			transform: scaleX(0);
+			transform-origin: left;
+			transition: transform 170ms ease;
+		}
+
+		.nav-link:hover,
+		.nav-link:focus-visible {
+			color: #dce2ff;
+			outline: none;
+		}
+
+		.nav-link:hover::after,
+		.nav-link:focus-visible::after {
+			transform: scaleX(1);
+		}
+
+		main {
+			max-width: 900px;
+			margin: 0 auto;
+			padding: 8rem 1.2rem 4rem;
+		}
+
+		.card {
+			background: rgba(14, 16, 24, 0.52);
+			border: 1px solid rgba(255, 255, 255, 0.12);
+			border-radius: 20px;
+			padding: 2.3rem 1.8rem;
+			backdrop-filter: blur(8px);
+		}
+
+		h1 {
+			font-size: clamp(2rem, 5vw, 2.9rem);
+			margin-bottom: 1rem;
+			background: linear-gradient(135deg, #dce2ff, var(--accent));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		h2 {
+			font-size: clamp(1.2rem, 3vw, 1.7rem);
+			margin-top: 1.7rem;
+			margin-bottom: 0.7rem;
+			color: #b8c1f0;
+		}
+
+		p {
+			color: var(--text-muted);
+			line-height: 1.75;
+			margin-bottom: 1rem;
+		}
+
+		footer {
+			padding: 1.7rem 1rem;
+			text-align: center;
+			font-size: 0.8rem;
+			color: rgba(154, 164, 194, 0.45);
+			border-top: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		@media (max-width: 900px) {
+			header.topbar {
+				padding: 1rem 1rem 1.2rem;
+			}
+
+			.topbar-inner {
+				flex-direction: column;
+				gap: 0.6rem;
+			}
+
+			.menu-left,
+			.menu-right {
+				justify-content: center;
+				flex-wrap: wrap;
+				gap: 0.9rem;
+			}
+
+			.name {
+				order: 0;
+			}
+
+			.menu-left {
+				order: -1;
+			}
+
+			.menu-right {
+				order: 1;
+			}
+
+			.nav-link {
+				min-width: 110px;
+			}
+
+			main {
+				padding-top: 10.5rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header class="topbar" aria-label="Primary site navigation">
+		<div class="topbar-inner">
+			<nav class="menu menu-left" aria-label="Primary portfolio links left">
+				<a class="nav-link" href="./index.html#about">About Me</a>
+				<a class="nav-link" href="./teachingphilosophy.html">Teaching Philosophy</a>
+			</nav>
+
+			<a href="./index.html#hero" style="text-decoration: none; color: inherit;">
+				<h1 class="name">Aaron Battle</h1>
+			</a>
+
+			<nav class="menu menu-right" aria-label="Primary portfolio links right">
+				<a class="nav-link" href="./teachingexperience.html">Teaching Experience</a>
+				<a class="nav-link" href="./index.html#contact">Contact</a>
+			</nav>
+		</div>
+	</header>
+
+	<main>
+		<section class="card">
+			<h1>Teaching Philosophy</h1>
+			<p>Every student has the potential to create, express, and connect through music. My philosophy centers on meeting students where they are and guiding them toward discovering their unique musical voice.</p>
+			<p>I believe in building an environment that balances structure with creativity and discipline with joy. Music education is not only about technique; it is about confidence, self-awareness, collaboration, and lifelong curiosity.</p>
+
+			<h2>Student-Centered Learning</h2>
+			<p>Instruction should adapt to the learner. I begin by understanding each student&apos;s goals, strengths, and challenges, then use intentional scaffolding to move them from their current level toward meaningful and measurable growth.</p>
+
+			<h2>Musicianship Through Relevance</h2>
+			<p>Students grow faster when lessons connect to music they care about. I integrate repertoire, improvisation, listening, and analysis so learning remains rigorous while still personally meaningful.</p>
+
+			<h2>Growth Mindset and Reflection</h2>
+			<p>Progress in music comes from steady practice, reflective habits, and resilient thinking. I encourage students to analyze their own work, celebrate improvements, and treat challenges as opportunities to learn.</p>
+		</section>
+	</main>
+
+	<footer>
+		Website Designed and Engineered by Aaron Battle
+	</footer>
+</body>
+</html>
