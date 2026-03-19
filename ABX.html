@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>The Aaron Battle Experience</title>
+	<link rel="icon" href="./favicon.ico" sizes="any" />
+	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+	<link rel="manifest" href="./site.webmanifest" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+	<style>
+		:root {
+			color-scheme: dark;
+			--bg: #020202;
+			--bg-soft: #0a0a0a;
+			--text-main: #ffffff;
+			--text-muted: #d7d7d7;
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			min-height: 100vh;
+			font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			background: radial-gradient(circle at 50% 0%, #101010 0%, var(--bg) 58%);
+			color: var(--text-main);
+			overflow-x: hidden;
+		}
+
+		#particles-js {
+			position: fixed;
+			inset: 0;
+			z-index: -1;
+			pointer-events: none;
+		}
+
+		header.topbar {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 10;
+			padding: 1.35rem 2rem;
+			backdrop-filter: blur(6px);
+			background: rgba(2, 2, 2, 0.55);
+		}
+
+		.topbar-inner {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 3.6rem;
+		}
+
+		.name {
+			font-size: clamp(1.1rem, 3.5vw, 1.9rem);
+			font-weight: 800;
+			letter-spacing: -0.02em;
+			text-align: center;
+			white-space: nowrap;
+			order: 1;
+		}
+
+		.menu {
+			display: flex;
+			gap: 1.2rem;
+			align-items: center;
+		}
+
+		.menu-left {
+			order: 0;
+		}
+
+		.menu-right {
+			order: 2;
+		}
+
+		.nav-link {
+			text-decoration: none;
+			color: var(--text-main);
+			font-weight: 500;
+			font-size: 0.95rem;
+			letter-spacing: 0.01em;
+			position: relative;
+			padding-bottom: 0.15rem;
+			transition: color 160ms ease;
+			white-space: nowrap;
+			min-width: 140px;
+			text-align: center;
+			cursor: pointer;
+		}
+
+		.nav-link::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			bottom: -0.2rem;
+			width: 100%;
+			height: 1.5px;
+			background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
+			transform: scaleX(0);
+			transform-origin: left;
+			transition: transform 170ms ease;
+		}
+
+		.nav-link:hover,
+		.nav-link:focus-visible {
+			color: #ffffff;
+			outline: none;
+		}
+
+		.nav-link:hover::after,
+		.nav-link:focus-visible::after {
+			transform: scaleX(1);
+		}
+
+		main {
+			position: relative;
+			z-index: 0;
+			max-width: 1180px;
+			margin: 0 auto;
+			padding: 9.5rem 2rem 4.2rem;
+		}
+
+		.hero-copy {
+			text-align: center;
+			margin: 0 auto 3rem;
+			max-width: 940px;
+		}
+
+		.hero-copy h1 {
+			font-family: "Batang", "Baskerville", "Times New Roman", serif;
+			font-size: clamp(2.3rem, 6.5vw, 4.8rem);
+			line-height: 1.06;
+			letter-spacing: 0.01em;
+			font-weight: 700;
+			color: #ffffff;
+			text-shadow:
+				0 0 10px rgba(255, 255, 255, 0.65),
+				0 0 24px rgba(255, 255, 255, 0.4),
+				0 0 48px rgba(255, 255, 255, 0.2);
+			margin-bottom: 1.1rem;
+		}
+
+		.subtitle {
+			font-size: clamp(1.05rem, 2.6vw, 1.5rem);
+			font-weight: 500;
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+			color: rgba(255, 255, 255, 0.9);
+			margin-bottom: 1.4rem;
+		}
+
+		.intro {
+			font-size: clamp(1rem, 2.05vw, 1.17rem);
+			line-height: 1.85;
+			color: var(--text-muted);
+			max-width: 78ch;
+			margin: 0 auto;
+		}
+
+		.video-frame {
+			position: relative;
+			border-radius: 22px;
+			padding: clamp(0.9rem, 2vw, 1.3rem);
+			background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.08));
+			box-shadow:
+				0 0 0 1px rgba(255, 255, 255, 0.45),
+				0 0 35px rgba(255, 255, 255, 0.22),
+				0 0 95px rgba(255, 255, 255, 0.15);
+		}
+
+		.video-frame::before {
+			content: "";
+			position: absolute;
+			inset: -14px;
+			border-radius: 30px;
+			pointer-events: none;
+			border: 1px solid rgba(255, 255, 255, 0.18);
+			filter: blur(0.4px);
+		}
+
+		.video-wrap {
+			position: relative;
+			width: 100%;
+			aspect-ratio: 16 / 9;
+			border-radius: 14px;
+			overflow: hidden;
+			background: #000;
+		}
+
+		.video-wrap iframe {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			border: 0;
+		}
+
+		footer {
+			position: relative;
+			z-index: 5;
+			padding: 2rem 2rem 1.5rem;
+			background: rgba(3, 3, 3, 0.95);
+			border-top: 1px solid rgba(255, 255, 255, 0.08);
+			backdrop-filter: blur(8px);
+		}
+
+		.footer-content {
+			max-width: 1200px;
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		.footer-credit {
+			font-size: 0.8rem;
+			color: rgba(255, 255, 255, 0.42);
+			letter-spacing: 0.02em;
+			margin: 0;
+		}
+
+		@media (max-width: 900px) {
+			header.topbar {
+				padding: 1rem 1rem 1.2rem;
+			}
+
+			.topbar-inner {
+				flex-direction: column;
+				gap: 0.6rem;
+			}
+
+			.menu-left,
+			.menu-right {
+				justify-content: center;
+				flex-wrap: wrap;
+				gap: 0.9rem;
+			}
+
+			.name {
+				order: -1;
+			}
+
+			.menu-left {
+				order: 0;
+			}
+
+			.menu-right {
+				order: 0;
+			}
+
+			.nav-link {
+				min-width: 110px;
+			}
+
+			main {
+				padding: 8.7rem 1rem 3rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="particles-js" aria-hidden="true"></div>
+
+	<header class="topbar" aria-label="Primary site navigation">
+		<div class="topbar-inner">
+			<nav class="menu menu-left" aria-label="Primary portfolio links left">
+				<a class="nav-link" href="./index.html#about">About Me</a>
+				<a class="nav-link" href="./teachingphilosophy.html">Teaching Philosophy</a>
+			</nav>
+
+			<a href="./index.html" style="text-decoration: none; color: inherit;">
+				<h1 class="name">Aaron Battle</h1>
+			</a>
+
+			<nav class="menu menu-right" aria-label="Primary portfolio links right">
+				<a class="nav-link" href="./teachingexperience.html">Teaching Experience</a>
+				<a class="nav-link" href="./index.html#contact">Contact</a>
+			</nav>
+		</div>
+	</header>
+
+	<main>
+		<section class="hero-copy">
+			<h1>The Aaron Battle Experience</h1>
+			<p class="subtitle">Aaron Battle Percussion Senior Recital</p>
+			<p class="intro">This recital was designed as a fully immersive performance experience. I combined intentional lighting, layered audio design, and a purposeful stage layout to draw the audience into my artistic world. Every choice, from visual atmosphere to sonic detail, was crafted to transform the concert from a standard performance into a complete Aaron Battle experience.</p>
+		</section>
+
+		<section class="video-frame" aria-label="Aaron Battle Experience recital video">
+			<div class="video-wrap">
+				<iframe
+					src="https://www.youtube.com/embed/6MLX0FQHHUM"
+					title="The Aaron Battle Experience - Senior Recital"
+					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+					referrerpolicy="strict-origin-when-cross-origin"
+					allowfullscreen></iframe>
+			</div>
+		</section>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+	<script>
+		tsParticles.load("particles-js", {
+			fpsLimit: 60,
+			particles: {
+				number: { value: 78, density: { enable: true, area: 900 } },
+				color: { value: ["#ffffff", "#f4f4f4", "#dfdfdf"] },
+				links: {
+					enable: true,
+					distance: 140,
+					color: "#ffffff",
+					opacity: 0.16,
+					width: 1
+				},
+				move: {
+					enable: true,
+					speed: 0.8,
+					outModes: { default: "out" }
+				},
+				opacity: { value: { min: 0.12, max: 0.5 } },
+				size: { value: { min: 1, max: 2.6 } }
+			},
+			interactivity: {
+				events: {
+					onHover: { enable: true, mode: "repulse" },
+					resize: true
+				},
+				modes: {
+					repulse: { distance: 88, duration: 0.35 }
+				}
+			},
+			detectRetina: true,
+			background: { color: "transparent" }
+		});
+	</script>
+
+	<footer>
+		<div class="footer-content">
+			<p class="footer-credit">Website Designed and Engineered by Aaron Battle</p>
+			<p class="footer-credit">Contact: battle.aaron.m@gmail.com</p>
+		</div>
+	</footer>
+</body>
+</html>
