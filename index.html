@@ -142,16 +142,33 @@
 			pointer-events: none;
 		}
 
+		.bg-placeholder {
+			position: fixed;
+			inset: 0;
+			z-index: -4;
+			background: url("./media/concert.jpg") center center / cover no-repeat;
+			opacity: 1;
+			transition: opacity 900ms ease;
+		}
+
 		.bg-video {
 			position: fixed;
 			inset: 0;
 			width: 100%;
 			height: 100%;
 			object-fit: cover;
-			opacity: 1;
+			opacity: 0;
 			z-index: -3;
 			filter: saturate(0.85) contrast(1.05) brightness(0.75);
-			transition: opacity 0.1s ease-out;
+			transition: opacity 900ms ease;
+		}
+
+		body.video-ready .bg-video {
+			opacity: 1;
+		}
+
+		body.video-ready .bg-placeholder {
+			opacity: 0;
 		}
 
 		.bg-overlay {
@@ -703,6 +720,7 @@
 		</div>
 	</div>
 
+	<div class="bg-placeholder" aria-hidden="true"></div>
 	<video class="bg-video" autoplay muted loop playsinline preload="auto" poster="./media/concert.jpg">
 		<source src="./media/portfoliohome.mp4" type="video/mp4" />
 	</video>
@@ -827,7 +845,19 @@
 			}
 
 			videoReady = true;
+			document.body.classList.add("video-ready");
 			queueRevealAfterMinimum();
+		}
+
+		if (heroVideoElement) {
+			if (heroVideoElement.readyState >= 2) {
+				markVideoReady();
+			} else {
+				heroVideoElement.addEventListener("loadeddata", markVideoReady, { once: true });
+				heroVideoElement.addEventListener("canplay", markVideoReady, { once: true });
+			}
+		} else {
+			document.body.classList.add("video-ready");
 		}
 
 		if (shouldSkipLoader) {
@@ -838,18 +868,6 @@
 				pageLoader.remove();
 			}
 		} else {
-			if (heroVideoElement) {
-				if (heroVideoElement.readyState >= 2) {
-					markVideoReady();
-				} else {
-					heroVideoElement.addEventListener("loadeddata", markVideoReady, { once: true });
-					heroVideoElement.addEventListener("canplay", markVideoReady, { once: true });
-					heroVideoElement.addEventListener("error", markVideoReady, { once: true });
-				}
-			} else {
-				markVideoReady();
-			}
-
 			revealTimeoutId = window.setTimeout(revealSite, LOADER_MAX_MS);
 		}
 
