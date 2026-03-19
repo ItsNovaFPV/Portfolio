@@ -150,6 +150,34 @@
 			margin-bottom: 1rem;
 		}
 
+		.lead {
+			font-size: clamp(1.05rem, 2vw, 1.22rem);
+			color: rgba(243, 245, 255, 0.9);
+			line-height: 1.85;
+		}
+
+		.manifesto {
+			margin: 1.35rem 0 1.7rem;
+			padding: 0.9rem 0 0.9rem 1rem;
+			border-left: 2px solid rgba(123, 140, 255, 0.38);
+			font-size: clamp(1.02rem, 2vw, 1.18rem);
+			line-height: 1.8;
+			color: rgba(236, 240, 255, 0.95);
+			letter-spacing: 0.01em;
+		}
+
+		.philosophy-divider {
+			height: 1px;
+			background: linear-gradient(90deg, rgba(123, 140, 255, 0.5), rgba(255, 255, 255, 0.06));
+			margin: 1.7rem 0 1.3rem;
+		}
+
+		.principle + .principle {
+			margin-top: 1.2rem;
+			padding-top: 1.2rem;
+			border-top: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
 		footer {
 			padding: 1.7rem 1rem;
 			text-align: center;
@@ -176,15 +204,15 @@
 			}
 
 			.name {
-				order: 0;
-			}
-
-			.menu-left {
 				order: -1;
 			}
 
+			.menu-left {
+				order: 0;
+			}
+
 			.menu-right {
-				order: 1;
+				order: 0;
 			}
 
 			.nav-link {
@@ -219,22 +247,57 @@
 	<main>
 		<section class="card">
 			<h1>Teaching Philosophy</h1>
-			<p>Every student has the potential to create, express, and connect through music. My philosophy centers on meeting students where they are and guiding them toward discovering their unique musical voice.</p>
-			<p>I believe in building an environment that balances structure with creativity and discipline with joy. Music education is not only about technique; it is about confidence, self-awareness, collaboration, and lifelong curiosity.</p>
+			<p class="lead">As a music educator, it is my responsibility to create a classroom that is safe emotionally and physically, and joyful enough that students want to be part of it. When someone walks into rehearsal, they should feel life from the music, the students, and me.</p>
+			<p class="manifesto">I lead through energy, build intrinsic motivation, and challenge students toward excellence in ways that are relevant, authentic, and human.</p>
 
-			<h2>Student-Centered Learning</h2>
-			<p>Instruction should adapt to the learner. I begin by understanding each student&apos;s goals, strengths, and challenges, then use intentional scaffolding to move them from their current level toward meaningful and measurable growth.</p>
+			<div class="philosophy-divider" aria-hidden="true"></div>
 
-			<h2>Musicianship Through Relevance</h2>
-			<p>Students grow faster when lessons connect to music they care about. I integrate repertoire, improvisation, listening, and analysis so learning remains rigorous while still personally meaningful.</p>
+			<div class="principle">
+				<h2>Safe, Positive, and Equitable</h2>
+				<p>I create a learning environment where students feel comfortable, respected, and supported. The classroom should feel like a home. I also believe every student deserves access to music, regardless of background, and that equity is foundational to both safety and growth.</p>
+			</div>
 
-			<h2>Growth Mindset and Reflection</h2>
-			<p>Progress in music comes from steady practice, reflective habits, and resilient thinking. I encourage students to analyze their own work, celebrate improvements, and treat challenges as opportunities to learn.</p>
+			<div class="principle">
+				<h2>Goals That Fit the Student</h2>
+				<p>Each student and section learns differently. I set goals that are relevant and specialized, then adjust instruction to meet students where they are. Getting to know students personally is one of the most important parts of helping them succeed musically.</p>
+			</div>
+
+			<div class="principle">
+				<h2>Collaboration Over Compliance</h2>
+				<p>I do not want rehearsals where students are simply told what to do. Students grow more when they help shape goals, expectations, and musical decisions. I prioritize student-teacher dialogue, student-student communication, and interaction across sections.</p>
+			</div>
+
+			<div class="principle">
+				<h2>Diverse Repertoire and Context</h2>
+				<p>Students should encounter music by composers from many cultures, races, and genders. I also teach the cultural and historical context behind the music so performance is not just accurate, but informed and meaningful.</p>
+			</div>
+
+			<div class="principle">
+				<h2>Challenge With Care</h2>
+				<p>Every student should be growing. No one should plateau, and no one should be pushed beyond what they can handle. My job is to choose and sequence music thoughtfully, then build the technical foundation so each student can progress with confidence.</p>
+			</div>
+
+			<div class="principle">
+				<h2>Energy, Reflection, and Transfer</h2>
+				<p>Energy is contagious. Teaching with passion helps students build intrinsic motivation and a lasting love of music. I also make reflection central: students review recordings, revisit fundamentals, and learn to transfer concepts from one piece to the next rather than relearn from scratch.</p>
+			</div>
+
+			<div class="principle">
+				<h2>Listening, Technology, and Choice</h2>
+				<p>Students improve faster when they regularly watch and listen to strong models. I use technology to support communication, feedback, and progress tracking, including video submissions with flexible options for students to perform live outside of class when preferred.</p>
+			</div>
+
+			<div class="principle">
+				<h2>Students as People First</h2>
+				<p>I aim to support students beyond music. My classroom door is open, and students should feel welcome to ask questions, seek help, and be heard. Music is the vehicle that connects people, and that community should be a place where students can learn in the pace and style that is right for them.</p>
+			</div>
 		</section>
 	</main>
 
 	<footer>
 		Website Designed and Engineered by Aaron Battle
+        <br>
+        Contact: battle.aaron.m@gmail.com
 	</footer>
 </body>
 </html>
