@@ -462,7 +462,8 @@
 			margin-top: 0.6rem;
 		}
 
-		.about-image img {
+		.about-image img,
+		.about-image video {
 			width: 100%;
 			display: block;
 			border-radius: 16px;
@@ -749,7 +750,9 @@
 
 			<div class="about-row reverse">
 				<figure class="about-image">
-					<img src="./media/conducting.gif" alt="Focused teaching moment" />
+					<video autoplay muted loop playsinline preload="metadata" aria-label="Focused teaching moment">
+						<source src="./media/conducting.mp4" type="video/mp4" />
+					</video>
 				</figure>
 				<div class="about-text">
 					<h3>My Approach</h3>
