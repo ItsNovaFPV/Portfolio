@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Aaron Battle Music</title>
+	<title>Aaron Battle Musicon </title>
 	<link rel="icon" href="./favicon.ico" sizes="any" />
 	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
 	<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
@@ -12,6 +12,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap" rel="stylesheet" />
+	<link rel="preload" href="./media/portfoliohome.mp4" as="video" type="video/mp4" />
 	<style>
 		:root {
 			color-scheme: dark;
@@ -634,15 +635,15 @@
 			}
 
 			.name {
-				order: -1;
+				order: 0;
 			}
 
 			.menu-left {
-				order: 0;
+				order: 1;
 			}
 
 			.menu-right {
-				order: 0;
+				order: 2;
 			}
 
 			.nav-link {
@@ -701,7 +702,7 @@
 		</div>
 	</div>
 
-	<video class="bg-video" autoplay muted loop playsinline>
+	<video class="bg-video" autoplay muted loop playsinline preload="auto" poster="./media/concert.jpg">
 		<source src="./media/portfoliohome.mp4" type="video/mp4" />
 	</video>
 	<div class="bg-overlay" aria-hidden="true"></div>
@@ -782,8 +783,8 @@
 		const pageLoader = document.getElementById("site-loader");
 		const heroVideoElement = document.querySelector(".bg-video");
 		const shouldSkipLoader = window.__skipHomeLoader === true;
-		const LOADER_MIN_MS = 3000;
-		const LOADER_MAX_MS = 5000;
+		const LOADER_MIN_MS = 1800;
+		const LOADER_MAX_MS = 3500;
 		const loaderStartTime = performance.now();
 		let revealTimeoutId;
 		let siteRevealed = false;
