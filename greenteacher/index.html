@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Oye Como Va — Teacher Cockpit</title>
+    <link rel="icon" href="../favicon.ico" sizes="any" />
+    <meta name="robots" content="noindex" />
+    <style>
+        /* ─────────────────────────────────────────────────────────────────
+           Self-contained styles. System fonts only — zero network
+           (except the optional YouTube finale slide, which needs wifi).
+           ───────────────────────────────────────────────────────────────── */
+        :root {
+            color-scheme: dark;
+            --text:      #ffffff;
+            --text-dim:  #dbe6fb;
+            --accent:    #7cd8a6;   /* mint — active stem / primary nav */
+            --accent-2:  #a3e8c2;
+            --warn:      #ff9788;
+            --line:      rgba(255, 255, 255, 0.38);
+            --glass:     rgba(125, 173, 235, 0.22);
+            --glass-hi:  rgba(160, 200, 245, 0.34);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            /* Lighter, modern blue base (shows through the templo wash). */
+            background: linear-gradient(160deg, #6aa6ee 0%, #356fd0 55%, #1f4fb0 100%);
+        }
+
+        /* ── Background: templo photo + light-blue wash + particles ─────── */
+        .bg-image {
+            position: fixed; inset: 0; z-index: 0;
+            background: url('../templo.jpg') center/cover no-repeat;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+        .bg-wash {
+            position: fixed; inset: 0; z-index: 0;
+            background: linear-gradient(180deg, rgba(120, 172, 232, 0.20) 0%, rgba(40, 92, 180, 0.42) 100%);
+            pointer-events: none;
+        }
+        .particles {
+            position: fixed; inset: 0; z-index: 1;
+            pointer-events: none;
+        }
+
+        /* ── Deck + slides ────────────────────────────────────────────── */
+        .deck { position: relative; width: 100vw; height: 100vh; z-index: 2; }
+
+        .slide {
+            position: absolute; inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity 300ms ease, transform 300ms ease;
+            pointer-events: none;
+        }
+        .slide.is-active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .slide { transition: opacity 80ms ease; transform: none !important; }
+        }
+
+        /* Image slides — fill the whole screen edge to edge. */
+        .slide--image > img {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        /* A 16:9 "stage" that covers the viewport exactly like object-fit:cover.
+           Anything positioned inside it (in %) tracks the slide image on EVERY
+           device size — used for the West Africa video overlay. */
+        .stage {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            --stage-w: max(100vw, 177.7778vh);   /* 16:9 width that covers */
+            width: var(--stage-w);
+            height: calc(var(--stage-w) * 0.5625);
+        }
+        .stage > img { width: 100%; height: 100%; object-fit: fill; display: block; }
+
+        /* Video player overlaid on the placeholder baked into 2.png.
+           Defaults measured from the PNG; live-adjustable via the V panel. */
+        .wa-video {
+            position: absolute;
+            left:  var(--wa-x, 1.95%);
+            top:   var(--wa-y, 39.7%);
+            width: var(--wa-w, 29%);
+            aspect-ratio: 16 / 9;
+            border: 0;
+            border-radius: 6px;
+            background: #000;
+            box-shadow: 0 10px 30px rgba(0, 20, 60, 0.45);
+        }
+
+        /* Alignment panel (toggle with the V key) */
+        .vid-adjust {
+            position: fixed;
+            top: 18px; right: 18px;
+            z-index: 100;
+            width: 260px;
+            padding: 16px 18px;
+            background: rgba(20, 52, 130, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 12px 36px rgba(0, 20, 60, 0.45);
+            font-size: 0.85rem;
+        }
+        .vid-adjust[hidden] { display: none; }
+        .vid-adjust h3 { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; }
+        .vid-adjust-row { margin-bottom: 12px; }
+        .vid-adjust-row label { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 600; }
+        .vid-adjust-row output { color: var(--accent); font-variant-numeric: tabular-nums; }
+        .vid-adjust input[type=range] { width: 100%; accent-color: var(--accent); }
+        .vid-adjust .hint { color: var(--text-dim); font-size: 0.72rem; line-height: 1.4; margin-top: 6px; }
+
+        /* ── Title slide (text) ───────────────────────────────────────── */
+        .slide--title { padding: 0 64px 260px; }
+        .display {
+            font-size: clamp(3.6rem, 11vw, 9.5rem);
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.01em;
+            margin-bottom: 22px;
+            text-shadow: 0 4px 30px rgba(0, 20, 60, 0.5);
+        }
+        .display em { font-style: italic; color: var(--accent); font-weight: 800; }
+        .micro {
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            text-shadow: 0 2px 16px rgba(0, 20, 60, 0.45);
+        }
+
+        /* ── Video (YouTube) slide ────────────────────────────────────── */
+        .slide--video { padding: 40px 40px 150px; }
+        .video-frame {
+            width: min(92vw, 1280px);
+            aspect-ratio: 16 / 9;
+            max-height: 80vh;
+            border: 0;
+            border-radius: 18px;
+            box-shadow: 0 24px 60px rgba(0, 20, 60, 0.5);
+            background: #000;
+        }
+
+        /* ── Bottom bar (stems + nav) ─────────────────────────────────── */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            z-index: 50;
+            padding: 22px 28px 18px;
+            background: transparent;                 /* image/video slides: clear */
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        /* Title slide gets a soft gradient so the stems read well. */
+        body.on-title .bottom-bar {
+            background: linear-gradient(to top, rgba(20, 52, 130, 0.92) 60%, rgba(20, 52, 130, 0) 100%);
+        }
+
+        .stems-row {
+            display: none;                            /* hidden on image/video slides */
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+        }
+        .audio-status { display: none; }
+        body.on-title .stems-row { display: grid; }
+        body.on-title .audio-status { display: block; }
+
+        /* Modern glassy buttons (lighter blue, frosted). */
+        .stem-btn {
+            min-height: 96px;
+            background: var(--glass);
+            color: var(--text);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            font: inherit;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(12px) saturate(1.1);
+            -webkit-backdrop-filter: blur(12px) saturate(1.1);
+            box-shadow: 0 8px 24px rgba(0, 20, 60, 0.22);
+            transition: background 140ms, border-color 140ms, color 140ms, transform 80ms, box-shadow 140ms;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .stem-btn .stem-state {
+            font-size: 0.68rem;
+            letter-spacing: 0.20em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        .stem-btn:hover { background: var(--glass-hi); border-color: rgba(255,255,255,0.55); }
+        .stem-btn:active { transform: translateY(1px); }
+        .stem-btn.is-on {
+            background: var(--accent);
+            color: #06241b;
+            border-color: var(--accent);
+            box-shadow: 0 8px 28px rgba(124, 216, 166, 0.45);
+        }
+        .stem-btn.is-on .stem-state { color: rgba(6, 36, 27, 0.65); }
+        .stem-btn.is-on::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 22px;
+            border: 2px solid rgba(124, 216, 166, 0.55);
+            opacity: 0;
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%   { opacity: 0.0; transform: scale(0.97); }
+            50%  { opacity: 0.8; transform: scale(1.00); }
+            100% { opacity: 0.0; transform: scale(1.03); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .stem-btn.is-on::before { animation: none; opacity: 0.5; }
+        }
+
+        .audio-status {
+            font-size: 0.78rem;
+            color: var(--accent-2);
+            letter-spacing: 0.08em;
+            text-align: center;
+            min-height: 1.2em;
+        }
+        .audio-status.error { color: var(--warn); }
+
+        .nav-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+        }
+        .dots { display: flex; gap: 10px; }
+        .dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 1px 6px rgba(0, 20, 60, 0.4);
+            transition: background 200ms ease, transform 200ms ease;
+        }
+        .dot.is-active { background: var(--accent); transform: scale(1.25); }
+
+        .nav-controls { display: flex; gap: 14px; }
+        .nav-btn {
+            background: var(--glass);
+            color: var(--text);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 0 28px;
+            min-height: 64px;
+            font: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(12px) saturate(1.1);
+            -webkit-backdrop-filter: blur(12px) saturate(1.1);
+            box-shadow: 0 8px 24px rgba(0, 20, 60, 0.22);
+            transition: background 150ms, border-color 150ms, transform 80ms;
+        }
+        .nav-btn:hover { background: var(--glass-hi); border-color: rgba(255,255,255,0.55); }
+        .nav-btn:active { transform: translateY(1px); }
+        .nav-btn:disabled { opacity: 0.4; cursor: default; }
+        .nav-btn--primary {
+            background: var(--accent);
+            color: #06241b;
+            border-color: var(--accent);
+            min-width: 200px;
+            font-size: 1.05rem;
+            box-shadow: 0 8px 28px rgba(124, 216, 166, 0.4);
+        }
+        .nav-btn--primary:hover { background: var(--accent-2); border-color: var(--accent-2); }
+    </style>
+</head>
+<body class="on-title">
+
+<!-- Background: templo photo + light-blue wash + floating particles -->
+<div class="bg-image" aria-hidden="true"></div>
+<div class="bg-wash"  aria-hidden="true"></div>
+<canvas class="particles" id="particles" aria-hidden="true"></canvas>
+
+<!-- ─────────── Deck ─────────── -->
+<div class="deck" id="deck">
+
+    <!-- Slide 1 — Title (text) -->
+    <section class="slide slide--title is-active" data-slide="1">
+        <div class="display"><em>Oye Como Va</em></div>
+        <div class="micro">Santana · The Mambo Bell Pattern</div>
+    </section>
+
+    <!-- Slides 2–6 — full-screen images -->
+    <section class="slide slide--image" data-slide="2"><img src="../media/1.png" alt="Slide 1"></section>
+
+    <!-- Slide showing 2.png — has a video player overlaid on its placeholder -->
+    <section class="slide slide--image" data-slide="3">
+        <div class="stage">
+            <img src="../media/2.png" alt="Slide 2 — West Africa">
+            <iframe class="wa-video" id="waVideo"
+                    data-src="https://www.youtube.com/embed/jW1dqayPbkY?list=PLWpVChfrelGFlgI251yanqa0EqmgwckXN&rel=0&modestbranding=1"
+                    title="West Africa rhythms"
+                    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                    allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <section class="slide slide--image" data-slide="4"><img src="../media/3.png" alt="Slide 3"></section>
+    <section class="slide slide--image" data-slide="5"><img src="../media/4.png" alt="Slide 4"></section>
+    <section class="slide slide--image" data-slide="6"><img src="../media/5.png" alt="Slide 5"></section>
+
+    <!-- Slide 7 — YouTube finale (requires internet) -->
+    <section class="slide slide--video" data-slide="7" data-video="true">
+        <iframe class="video-frame" id="ytFrame"
+                data-src="https://www.youtube.com/embed/U3XPzwjhSZw?rel=0&modestbranding=1"
+                title="Oye Como Va — Santana"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowfullscreen></iframe>
+    </section>
+
+</div>
+
+<!-- ─────────── Bottom bar — stems (title slide only) + nav (always) ─────────── -->
+<div class="bottom-bar">
+    <div class="stems-row">
+        <button class="stem-btn" data-stem="bell"       type="button">Bell <span class="stem-state">mambo pattern</span></button>
+        <button class="stem-btn" data-stem="organ"      type="button">Organ</button>
+        <button class="stem-btn" data-stem="bass"       type="button">Bass</button>
+        <button class="stem-btn" data-stem="guitar"     type="button">Guitar</button>
+        <button class="stem-btn" data-stem="percussion" type="button">Percussion</button>
+    </div>
+    <p class="audio-status" id="audioStatus"></p>
+    <div class="nav-row">
+        <div class="dots" id="dots">
+            <span class="dot is-active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+        <div class="nav-controls">
+            <button class="nav-btn" id="prevBtn" type="button">← Prev</button>
+            <button class="nav-btn nav-btn--primary" id="nextBtn" type="button">Next →</button>
+        </div>
+    </div>
+</div>
+
+<!-- Video alignment panel — toggle with the V key (for lining up the player) -->
+<div class="vid-adjust" id="vidAdjust" hidden>
+    <h3>Video alignment</h3>
+    <div class="vid-adjust-row">
+        <label>Left <output id="oX"></output></label>
+        <input type="range" id="rX" min="0" max="70" step="0.1">
+    </div>
+    <div class="vid-adjust-row">
+        <label>Top <output id="oY"></output></label>
+        <input type="range" id="rY" min="0" max="80" step="0.1">
+    </div>
+    <div class="vid-adjust-row">
+        <label>Width <output id="oW"></output></label>
+        <input type="range" id="rW" min="8" max="80" step="0.1">
+    </div>
+    <p class="hint">Press <strong>V</strong> to hide. Position is saved on this device. Height follows 16:9 automatically.</p>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════
+   SLIDE ENGINE — 7 slides. Stems show only on the title slide; the YouTube
+   iframe is lazy-loaded when its slide is reached and unloaded on leaving
+   (so it stops playing and doesn't phone home until needed).
+   ════════════════════════════════════════════════════════════════════════ */
+(function () {
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dots   = Array.from(document.querySelectorAll('.dot'));
+    const prev   = document.getElementById('prevBtn');
+    const next   = document.getElementById('nextBtn');
+    const lazyFrames = Array.from(document.querySelectorAll('iframe[data-src]'));
+    let current = 0;
+
+    function syncChrome() {
+        // Stems + status visible only on the title slide.
+        document.body.classList.toggle('on-title', current === 0);
+        // Each video iframe loads only while its slide is active; unloading on
+        // leave stops playback and avoids phoning home until needed.
+        lazyFrames.forEach((f) => {
+            const active = f.closest('.slide').classList.contains('is-active');
+            if (active) {
+                if (f.getAttribute('src') !== f.dataset.src) f.setAttribute('src', f.dataset.src);
+            } else if (f.getAttribute('src')) {
+                f.removeAttribute('src');
+            }
+        });
+    }
+
+    function go(idx) {
+        if (idx < 0 || idx >= slides.length) return;
+        slides[current].classList.remove('is-active');
+        current = idx;
+        slides[current].classList.add('is-active');
+        dots.forEach((d, i) => d.classList.toggle('is-active', i === current));
+        prev.disabled = current === 0;
+        next.textContent = current === slides.length - 1 ? 'Done' : 'Next →';
+        syncChrome();
+    }
+
+    next.addEventListener('click', () => { if (current < slides.length - 1) go(current + 1); });
+    prev.addEventListener('click', () => go(current - 1));
+    window.addEventListener('keydown', (e) => {
+        if (e.target.matches('input, textarea')) return;
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); if (current < slides.length - 1) go(current + 1); }
+        if (e.key === 'ArrowLeft'  || e.key === 'PageUp') { e.preventDefault(); go(current - 1); }
+    });
+    prev.disabled = true;
+    syncChrome();
+})();
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   AUDIO ENGINE — stems only, loop always on, no tempo/full-song.
+   Drift fix: all stems share a single loopEnd = min(buffer.duration).
+   ════════════════════════════════════════════════════════════════════════ */
+const stemFiles = {
+    bell:       '../media/audio/Bell.mp3',
+    organ:      '../media/audio/Organ.mp3',
+    bass:       '../media/audio/Bass.mp3',
+    guitar:     '../media/audio/Guitar.mp3',
+    percussion: '../media/audio/Percussion.mp3',
+};
+
+let audioCtx     = null;
+let masterGain   = null;
+let buffers      = {};
+let sources      = {};
+let gains        = {};
+let isPlaying    = false;
+let loopEnd      = 0;                                                    // common loop length across stems
+const stemOn     = { bell: false, organ: false, bass: false, guitar: false, percussion: false };
+let loadPromise  = null;
+
+const statusEl   = document.getElementById('audioStatus');
+
+async function ensureAudio() {
+    if (audioCtx) return loadPromise;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.9;
+    masterGain.connect(audioCtx.destination);
+    statusEl.classList.remove('error');
+    statusEl.textContent = 'Loading stems…';
+    loadPromise = Promise.all(Object.entries(stemFiles).map(async ([key, url]) => {
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const ab  = await res.arrayBuffer();
+            buffers[key] = await audioCtx.decodeAudioData(ab);
+        } catch (e) {
+            console.warn('[audio] failed to load', key, e);
+            buffers[key] = null;
+        }
+    })).then(() => {
+        const loaded = Object.values(buffers).filter(Boolean);
+        if (!loaded.length) {
+            statusEl.classList.add('error');
+            statusEl.textContent = 'No stem files found in media/audio/.';
+            return;
+        }
+        // Drift fix: every stem loops at the same boundary regardless of tiny
+        // duration differences from MP3 encoder padding.
+        loopEnd = Math.min(...loaded.map(b => b.duration));
+        const missing = Object.entries(buffers).filter(([, b]) => !b).map(([k]) => k);
+        if (missing.length) {
+            statusEl.textContent = 'Missing: ' + missing.join(', ');
+        } else {
+            statusEl.textContent = '';
+        }
+    });
+    return loadPromise;
+}
+
+function startAllStems() {
+    if (isPlaying) return;
+    const startAt = audioCtx.currentTime + 0.05;
+    for (const key of Object.keys(stemFiles)) {
+        if (!buffers[key]) continue;
+        const src = audioCtx.createBufferSource();
+        src.buffer = buffers[key];
+        src.loop = true;
+        // Force a shared loop window so all stems wrap at the same instant.
+        src.loopStart = 0;
+        src.loopEnd   = loopEnd;
+        const g = audioCtx.createGain();
+        g.gain.value = stemOn[key] ? 1 : 0;
+        src.connect(g).connect(masterGain);
+        src.start(startAt);
+        sources[key] = src;
+        gains[key]   = g;
+    }
+    isPlaying = true;
+}
+
+function stopAllStems() {
+    for (const key of Object.keys(sources)) {
+        try { sources[key].stop(); } catch (e) {}
+    }
+    sources = {};
+    gains   = {};
+    isPlaying = false;
+}
+
+async function toggleStem(key) {
+    await ensureAudio();
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+    stemOn[key] = !stemOn[key];
+    document.querySelector('.stem-btn[data-stem="' + key + '"]').classList.toggle('is-on', stemOn[key]);
+    const anyOn = Object.values(stemOn).some(Boolean);
+
+    if (anyOn) {
+        startAllStems();
+        const g = gains[key];
+        if (g) {
+            const now = audioCtx.currentTime;
+            g.gain.cancelScheduledValues(now);
+            g.gain.setValueAtTime(g.gain.value, now);
+            g.gain.linearRampToValueAtTime(stemOn[key] ? 1 : 0, now + 0.04);
+        }
+    } else {
+        if (isPlaying) stopAllStems();
+    }
+}
+
+document.querySelectorAll('.stem-btn').forEach((btn) => {
+    btn.addEventListener('click', () => toggleStem(btn.dataset.stem));
+});
+
+// Preload buffers shortly after first paint so the panel responds instantly.
+window.addEventListener('load', () => { setTimeout(ensureAudio, 250); });
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   VIDEO ALIGNMENT — position the West Africa player over its placeholder.
+   Percentages of the slide, so it lines up on every device size. Toggle the
+   panel with the V key; settings persist in localStorage.
+   ════════════════════════════════════════════════════════════════════════ */
+(function () {
+    const overlay = document.getElementById('waVideo');
+    const panel   = document.getElementById('vidAdjust');
+    if (!overlay || !panel) return;
+
+    const KEY = 'greenteacher.waVideo';
+    const DEFAULTS = { x: 1.95, y: 39.7, w: 29 };           // measured from 2.png
+    let cfg = Object.assign({}, DEFAULTS);
+    try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) cfg = Object.assign(cfg, s); } catch (e) {}
+
+    const rX = document.getElementById('rX'), oX = document.getElementById('oX');
+    const rY = document.getElementById('rY'), oY = document.getElementById('oY');
+    const rW = document.getElementById('rW'), oW = document.getElementById('oW');
+
+    function apply() {
+        overlay.style.setProperty('--wa-x', cfg.x + '%');
+        overlay.style.setProperty('--wa-y', cfg.y + '%');
+        overlay.style.setProperty('--wa-w', cfg.w + '%');
+        rX.value = cfg.x; oX.textContent = cfg.x.toFixed(1) + '%';
+        rY.value = cfg.y; oY.textContent = cfg.y.toFixed(1) + '%';
+        rW.value = cfg.w; oW.textContent = cfg.w.toFixed(1) + '%';
+    }
+    function save() { try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch (e) {} }
+
+    rX.addEventListener('input', () => { cfg.x = parseFloat(rX.value); apply(); save(); });
+    rY.addEventListener('input', () => { cfg.y = parseFloat(rY.value); apply(); save(); });
+    rW.addEventListener('input', () => { cfg.w = parseFloat(rW.value); apply(); save(); });
+
+    window.addEventListener('keydown', (e) => {
+        if (e.target.matches('input, textarea')) return;
+        if (e.key === 'v' || e.key === 'V') { e.preventDefault(); panel.hidden = !panel.hidden; }
+    });
+
+    apply();
+})();
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   FLOATING PARTICLES — soft light bokeh drifting upward. Frozen under
+   prefers-reduced-motion. Behind the slides (only seen on title/video).
+   ════════════════════════════════════════════════════════════════════════ */
+(function () {
+    const canvas = document.getElementById('particles');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const COUNT = 55;
+    const bits = [];
+    let viewW = 0, viewH = 0, dpr = 1;
+
+    function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        viewW = window.innerWidth;
+        viewH = window.innerHeight;
+        canvas.style.width  = viewW + 'px';
+        canvas.style.height = viewH + 'px';
+        canvas.width  = Math.round(viewW * dpr);
+        canvas.height = Math.round(viewH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function spawn() {
+        bits.length = 0;
+        for (let i = 0; i < COUNT; i++) {
+            bits.push({
+                x:  Math.random() * viewW,
+                y:  Math.random() * viewH,
+                r:  Math.random() * 3.4 + 1.0,
+                vy: -(Math.random() * 0.45 + 0.18),   // drift upward
+                vx: (Math.random() - 0.5) * 0.25,
+                a:  Math.random() * 0.4 + 0.12,
+                sw: Math.random() * Math.PI * 2,
+            });
+        }
+    }
+
+    function paint(b) {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(235, 244, 255,' + b.a + ')';
+        ctx.fill();
+    }
+
+    function tick() {
+        ctx.clearRect(0, 0, viewW, viewH);
+        for (const b of bits) {
+            b.sw += 0.008;
+            b.x += b.vx + Math.sin(b.sw) * 0.12;
+            b.y += b.vy;
+            if (b.y < -8) { b.y = viewH + 8; b.x = Math.random() * viewW; }
+            if (b.x < -8)        b.x = viewW + 8;
+            if (b.x > viewW + 8) b.x = -8;
+            paint(b);
+        }
+        requestAnimationFrame(tick);
+    }
+
+    resize();
+    spawn();
+    window.addEventListener('resize', () => { resize(); spawn(); });
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!reduced.matches) {
+        tick();
+    } else {
+        bits.forEach(paint);
+    }
+})();
+</script>
+</body>
+</html>

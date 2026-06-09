@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exit Ticket — Oye Como Va</title>
+    <link rel="icon" href="../favicon.ico" sizes="any" />
+    <meta name="robots" content="noindex" />
+    <style>
+        /* ─────────────────────────────────────────────────────────────────
+           Self-contained. System fonts only. Fully offline — no CDN, no
+           external scripts, no backend. All state stays in the page.
+           ───────────────────────────────────────────────────────────────── */
+        :root {
+            color-scheme: dark;
+            --ink:        #ffffff;
+            --dim:        #dbe6fb;
+            --glass:      rgba(255, 255, 255, 0.13);
+            --glass-hi:   rgba(255, 255, 255, 0.22);
+            --line:       rgba(255, 255, 255, 0.32);
+            --accent:     #7cd8a6;
+            --accent-2:   #a3e8c2;
+            --good:       #46e0a0;
+            --good-bg:    rgba(70, 224, 160, 0.20);
+            --bad:        #ff8f87;
+            --bad-bg:     rgba(255, 143, 135, 0.18);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { min-height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+            background: linear-gradient(160deg, #6aa6ee 0%, #356fd0 55%, #1f4fb0 100%);
+            min-height: 100vh;
+        }
+
+        /* ── Sky background + readability overlay ──────────────────────── */
+        .bg-image {
+            position: fixed; inset: 0; z-index: 0;
+            background: url('../templo.jpg') center/cover no-repeat;
+            opacity: 0.78;
+        }
+        .bg-overlay {
+            position: fixed; inset: 0; z-index: 0;
+            background: linear-gradient(180deg, rgba(12, 38, 86, 0.45) 0%, rgba(12, 38, 86, 0.66) 100%);
+        }
+
+        /* ── Layout ────────────────────────────────────────────────────── */
+        .wrap {
+            position: relative; z-index: 2;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 40px 20px 64px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header { text-align: center; margin-bottom: 22px; }
+        h1 {
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            text-shadow: 0 4px 24px rgba(0, 20, 60, 0.45);
+        }
+        h1 em { font-style: italic; color: var(--accent); }
+        .sub {
+            margin-top: 6px;
+            color: var(--dim);
+            font-size: 1rem;
+            letter-spacing: 0.04em;
+            text-shadow: 0 2px 14px rgba(0, 20, 60, 0.45);
+        }
+
+        /* ── Progress ──────────────────────────────────────────────────── */
+        .progress { margin-bottom: 20px; }
+        .progress-label {
+            font-size: 0.78rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--dim);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .progress-track {
+            height: 7px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, 0.18);
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            transition: width 480ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* ── Flowing stage / cards ─────────────────────────────────────── */
+        .stage {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            transition: opacity 300ms ease, transform 300ms ease;
+        }
+        .stage.is-leaving  { opacity: 0; transform: translateY(18px); }
+        .stage.is-entering { opacity: 0; transform: translateY(-18px); }
+
+        .card {
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 28px 26px;
+            backdrop-filter: blur(16px) saturate(1.15);
+            -webkit-backdrop-filter: blur(16px) saturate(1.15);
+            box-shadow: 0 20px 50px rgba(0, 20, 60, 0.32);
+        }
+        .q-text {
+            font-size: clamp(1.25rem, 3vw, 1.6rem);
+            font-weight: 700;
+            line-height: 1.35;
+            margin-bottom: 22px;
+        }
+
+        /* ── Answer options ────────────────────────────────────────────── */
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .opt {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            min-height: 62px;
+            padding: 14px 18px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1.5px solid var(--line);
+            border-radius: 14px;
+            color: var(--ink);
+            font: inherit;
+            font-size: 1.05rem;
+            line-height: 1.35;
+            cursor: pointer;
+            transition: background 160ms, border-color 160ms, transform 90ms, box-shadow 160ms;
+        }
+        .opt:hover { background: var(--glass-hi); border-color: rgba(255,255,255,0.5); }
+        .opt:active { transform: scale(0.992); }
+        .opt-letter {
+            flex-shrink: 0;
+            width: 30px; height: 30px;
+            display: grid; place-items: center;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.16);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .opt-mark { margin-left: auto; font-size: 1.3rem; font-weight: 800; opacity: 0; }
+
+        .opt.is-selected {
+            border-color: var(--accent);
+            background: rgba(124, 216, 166, 0.18);
+            box-shadow: 0 0 0 2px rgba(124, 216, 166, 0.35) inset;
+        }
+        .opt.is-selected .opt-letter { background: var(--accent); color: #06241b; }
+
+        /* Locked feedback states */
+        .opt.is-correct {
+            border-color: var(--good);
+            background: var(--good-bg);
+            box-shadow: 0 0 0 2px rgba(70, 224, 160, 0.4) inset;
+        }
+        .opt.is-correct .opt-letter { background: var(--good); color: #06241b; }
+        .opt.is-correct .opt-mark { opacity: 1; color: var(--good); }
+        .opt.is-wrong {
+            border-color: var(--bad);
+            background: var(--bad-bg);
+        }
+        .opt.is-wrong .opt-letter { background: var(--bad); color: #3a0f0c; }
+        .opt.is-wrong .opt-mark { opacity: 1; color: var(--bad); }
+        .opt.is-locked { cursor: default; }
+        .opt.is-locked:hover { background: rgba(255,255,255,0.10); border-color: var(--line); }
+        .opt.is-locked.is-selected:hover { background: rgba(124, 216, 166, 0.18); }
+        .opt.is-locked.is-correct:hover  { background: var(--good-bg); border-color: var(--good); }
+        .opt.is-locked.is-wrong:hover    { background: var(--bad-bg);  border-color: var(--bad); }
+
+        /* ── Textarea (free response) ──────────────────────────────────── */
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(255, 255, 255, 0.10);
+            color: var(--ink);
+            border: 1.5px solid var(--line);
+            border-radius: 14px;
+            padding: 16px;
+            font: inherit;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+            transition: border-color 160ms, background 160ms;
+        }
+        textarea::placeholder { color: rgba(219, 230, 251, 0.6); }
+        textarea:focus { border-color: var(--accent); background: rgba(255,255,255,0.14); }
+        textarea:disabled { opacity: 0.85; }
+
+        /* ── Feedback line ─────────────────────────────────────────────── */
+        .feedback {
+            margin-top: 18px;
+            font-size: 1rem;
+            line-height: 1.45;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 280ms ease, transform 280ms ease;
+        }
+        .feedback.is-shown { opacity: 1; transform: none; }
+        .feedback .fb-head { font-weight: 800; font-size: 1.1rem; display: block; margin-bottom: 2px; }
+        .feedback.good .fb-head { color: var(--good); }
+        .feedback.bad  .fb-head { color: var(--bad); }
+        .feedback .fb-explain { color: var(--dim); }
+
+        /* ── Action buttons ────────────────────────────────────────────── */
+        .card-actions { margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; }
+        .btn {
+            min-height: 56px;
+            padding: 0 30px;
+            border-radius: 14px;
+            border: 1px solid var(--accent);
+            background: var(--accent);
+            color: #06241b;
+            font: inherit;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: background 150ms, transform 90ms, box-shadow 150ms, opacity 150ms;
+            box-shadow: 0 10px 26px rgba(124, 216, 166, 0.32);
+        }
+        .btn:hover { background: var(--accent-2); border-color: var(--accent-2); }
+        .btn:active { transform: translateY(1px); }
+        .btn:disabled {
+            opacity: 0.45; cursor: not-allowed;
+            background: rgba(255,255,255,0.16); border-color: var(--line); color: var(--ink);
+            box-shadow: none;
+        }
+        [hidden] { display: none !important; }
+
+        /* ── Completion screen ─────────────────────────────────────────── */
+        .done { text-align: center; }
+        .done-check {
+            width: 92px; height: 92px;
+            margin: 4px auto 18px;
+            border-radius: 50%;
+            display: grid; place-items: center;
+            font-size: 3rem; font-weight: 800; color: #06241b;
+            background: linear-gradient(160deg, var(--accent-2), var(--accent));
+            box-shadow: 0 14px 36px rgba(124, 216, 166, 0.45);
+            animation: pop 520ms cubic-bezier(0.22, 1.4, 0.4, 1) both;
+        }
+        @keyframes pop { 0% { transform: scale(0.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .done h2 { font-size: clamp(1.6rem, 5vw, 2.3rem); font-weight: 800; margin-bottom: 12px; }
+        .done .score {
+            display: inline-block;
+            font-size: 1.15rem; font-weight: 700;
+            padding: 10px 20px; margin-bottom: 14px;
+            border-radius: 99px;
+            background: rgba(124, 216, 166, 0.18);
+            border: 1px solid var(--accent);
+        }
+        .done .closing { color: var(--dim); font-size: 1.05rem; line-height: 1.5; }
+        .your-response {
+            margin-top: 22px; text-align: left;
+            padding: 16px 18px;
+            border: 1px dashed rgba(124, 216, 166, 0.45);
+            background: rgba(124, 216, 166, 0.06);
+            border-radius: 14px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        .your-response .yr-label {
+            display: block; font-size: 0.7rem; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--dim); margin-bottom: 8px;
+        }
+
+        /* Confetti canvas */
+        #confetti { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
+
+        /* ── Reduced motion ────────────────────────────────────────────── */
+        @media (prefers-reduced-motion: reduce) {
+            .stage, .progress-fill, .feedback, .btn, .opt { transition: none !important; }
+            .stage.is-leaving, .stage.is-entering { transform: none !important; }
+            .done-check { animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-image"   aria-hidden="true"></div>
+<div class="bg-overlay" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<main class="wrap">
+    <header>
+        <h1>Exit Ticket</h1>
+        <p class="sub"><em>Oye Como Va</em> — the Mambo Bell Pattern</p>
+    </header>
+
+    <div class="progress" id="progress">
+        <div class="progress-label" id="progressLabel">Question 1 of 5</div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <section class="stage" id="stage" aria-live="polite"></section>
+</main>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════
+   EXIT TICKET — 4 graded MC questions + 1 ungraded reflection.
+   Fully offline; nothing leaves the device.
+   ════════════════════════════════════════════════════════════════════════ */
+const QUESTIONS = [
+    {
+        type: 'mc',
+        q: 'What is the mambo bell pattern?',
+        options: [
+            'The melody you sing along to',
+            'A repeating rhythm that holds the whole song together',
+            'A type of guitar',
+            'The name of the singer',
+        ],
+        correct: 1,
+        explain: 'The mambo bell pattern is a repeating rhythm — the structure everything else locks onto.',
+    },
+    {
+        type: 'mc',
+        q: 'Where did this rhythm originally come from?',
+        options: [
+            'West Africa',
+            'California',
+            'It was invented by Santana',
+            'Europe',
+        ],
+        correct: 0,
+        explain: "The pattern's roots are in West African bell and drumming traditions.",
+    },
+    {
+        type: 'mc',
+        q: 'Put the journey of this rhythm in the correct order:',
+        options: [
+            'West Africa → Cuba → America',
+            'America → Cuba → West Africa',
+            'Cuba → West Africa → America',
+            'It never traveled',
+        ],
+        correct: 0,
+        explain: 'It traveled West Africa → Cuba → America, carried across the world over centuries.',
+    },
+    {
+        type: 'free',
+        q: 'In your own words: What is the mambo bell pattern?',
+    },
+];
+
+const GRADED = QUESTIONS.filter(q => q.type === 'mc').length;   // 4
+const LETTERS = ['A', 'B', 'C', 'D'];
+
+const stage        = document.getElementById('stage');
+const progressLabel = document.getElementById('progressLabel');
+const progressFill = document.getElementById('progressFill');
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DUR = reduced ? 0 : 300;
+
+let index = 0;
+let score = 0;
+let selected = null;        // chosen option index for the current MC
+let answered = false;       // current question already submitted?
+let freeText = '';
+
+function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function setProgress() {
+    progressLabel.textContent = 'Question ' + (index + 1) + ' of ' + QUESTIONS.length;
+    progressFill.style.width = (((index + 1) / QUESTIONS.length) * 100) + '%';
+}
+
+/* ── Render the current question ─────────────────────────────────────── */
+function render() {
+    const item = QUESTIONS[index];
+    selected = null;
+    answered = false;
+    setProgress();
+
+    if (item.type === 'free') {
+        renderFree(item);
+    } else {
+        renderMC(item);
+    }
+}
+
+function renderMC(item) {
+    const opts = item.options.map((text, i) =>
+        '<button type="button" class="opt" data-i="' + i + '">' +
+            '<span class="opt-letter">' + LETTERS[i] + '</span>' +
+            '<span class="opt-body">' + esc(text) + '</span>' +
+            '<span class="opt-mark"></span>' +
+        '</button>'
+    ).join('');
+
+    stage.innerHTML =
+        '<div class="card">' +
+            '<p class="q-text">' + esc(item.q) + '</p>' +
+            '<div class="options" id="options">' + opts + '</div>' +
+            '<p class="feedback" id="feedback"></p>' +
+            '<div class="card-actions">' +
+                '<button class="btn" id="submitBtn" type="button" disabled>Submit</button>' +
+                '<button class="btn" id="nextBtn" type="button" hidden></button>' +
+            '</div>' +
+        '</div>';
+
+    const optionEls = Array.from(stage.querySelectorAll('.opt'));
+    const submitBtn = document.getElementById('submitBtn');
+    const nextBtn   = document.getElementById('nextBtn');
+
+    optionEls.forEach(el => el.addEventListener('click', () => {
+        if (answered) return;
+        selected = parseInt(el.dataset.i, 10);
+        optionEls.forEach(o => o.classList.toggle('is-selected', o === el));
+        submitBtn.disabled = false;
+    }));
+
+    submitBtn.addEventListener('click', () => {
+        if (answered || selected === null) return;
+        answered = true;
+        const isRight = selected === item.correct;
+        if (isRight) score++;
+
+        optionEls.forEach((o, i) => {
+            o.classList.add('is-locked');
+            if (i === item.correct) { o.classList.add('is-correct'); o.querySelector('.opt-mark').textContent = '✓'; }
+            if (i === selected && !isRight) { o.classList.add('is-wrong'); o.querySelector('.opt-mark').textContent = '✗'; }
+        });
+
+        const fb = document.getElementById('feedback');
+        submitBtn.hidden = true;
+
+        if (isRight) {
+            // Correct → flash "Correct!" then flow to the next question.
+            fb.className = 'feedback good';
+            fb.innerHTML = '<span class="fb-head">Correct! ✓</span>';
+            requestAnimationFrame(() => fb.classList.add('is-shown'));
+            setTimeout(advance, 850);
+        } else {
+            // Wrong → reveal the answer + explanation and wait for Next.
+            fb.className = 'feedback bad';
+            fb.innerHTML = '<span class="fb-head">Not quite ✗</span>' +
+                           '<span class="fb-explain">' + esc(item.explain) + '</span>';
+            requestAnimationFrame(() => fb.classList.add('is-shown'));
+            nextBtn.hidden = false;
+            nextBtn.textContent = (index === QUESTIONS.length - 1) ? 'Finish →' : 'Next →';
+            nextBtn.focus();
+        }
+    });
+
+    nextBtn.addEventListener('click', advance);
+}
+
+function renderFree(item) {
+    stage.innerHTML =
+        '<div class="card">' +
+            '<p class="q-text">' + esc(item.q) + '</p>' +
+            '<textarea id="freeText" placeholder="Type your answer here…"></textarea>' +
+            '<p class="feedback" id="feedback"></p>' +
+            '<div class="card-actions">' +
+                '<button class="btn" id="submitBtn" type="button">Submit</button>' +
+                '<button class="btn" id="nextBtn" type="button" hidden>See results →</button>' +
+            '</div>' +
+        '</div>';
+
+    const ta        = document.getElementById('freeText');
+    const submitBtn = document.getElementById('submitBtn');
+    const nextBtn   = document.getElementById('nextBtn');
+    ta.value = freeText;
+
+    submitBtn.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        freeText = ta.value.trim();
+        advance();   // straight to the reflection / completion screen
+    });
+
+    nextBtn.addEventListener('click', advance);
+}
+
+/* ── Flowing transition between questions ────────────────────────────── */
+function advance() {
+    if (index >= QUESTIONS.length - 1) {
+        transition(showCompletion);
+    } else {
+        transition(() => { index++; render(); });
+    }
+}
+
+function transition(swap) {
+    stage.classList.add('is-leaving');
+    setTimeout(() => {
+        swap();
+        stage.classList.remove('is-leaving');
+        stage.classList.add('is-entering');
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            stage.classList.remove('is-entering');
+        }));
+    }, DUR);
+}
+
+/* ── Completion ──────────────────────────────────────────────────────── */
+function showCompletion() {
+    progressLabel.textContent = 'Complete';
+    progressFill.style.width = '100%';
+
+    const responseBlock = freeText
+        ? '<div class="your-response"><span class="yr-label">Your reflection</span>' + esc(freeText) + '</div>'
+        : '';
+
+    stage.innerHTML =
+        '<div class="card done">' +
+            '<div class="done-check">✓</div>' +
+            '<h2>Exit Ticket Submitted</h2>' +
+            '<div class="score">You got ' + score + ' of ' + GRADED + ' correct</div>' +
+            '<p class="closing">Nice work, you followed a rhythm all the way around the world. ' +
+                'Thanks for being part of today’s lesson!</p>' +
+            responseBlock +
+        '</div>';
+
+    if (!reduced) launchConfetti();
+}
+
+/* ── Gentle confetti (offline canvas, no libraries) ──────────────────── */
+function launchConfetti() {
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let W, H, dpr;
+    function size() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = window.innerWidth; H = window.innerHeight;
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    size();
+    window.addEventListener('resize', size);
+
+    const colors = ['#7cd8a6', '#a3e8c2', '#ffd479', '#7fb6ff', '#ffffff'];
+    const pieces = [];
+    for (let i = 0; i < 130; i++) {
+        pieces.push({
+            x: Math.random() * W,
+            y: -20 - Math.random() * H * 0.5,
+            r: Math.random() * 6 + 4,
+            c: colors[(Math.random() * colors.length) | 0],
+            vy: Math.random() * 2.4 + 1.6,
+            vx: (Math.random() - 0.5) * 1.6,
+            rot: Math.random() * Math.PI,
+            vr: (Math.random() - 0.5) * 0.2,
+        });
+    }
+    const start = performance.now();
+    const LIFE = 3400;
+    (function frame(now) {
+        const t = now - start;
+        ctx.clearRect(0, 0, W, H);
+        const fade = t > LIFE - 700 ? Math.max(0, (LIFE - t) / 700) : 1;
+        ctx.globalAlpha = fade;
+        for (const p of pieces) {
+            p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.fillStyle = p.c;
+            ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.6);
+            ctx.restore();
+        }
+        ctx.globalAlpha = 1;
+        if (t < LIFE) requestAnimationFrame(frame);
+        else ctx.clearRect(0, 0, W, H);
+    })(start);
+}
+
+/* ── Boot ────────────────────────────────────────────────────────────── */
+render();
+</script>
+</body>
+</html>

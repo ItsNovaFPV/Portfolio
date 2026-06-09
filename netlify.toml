@@ -1,0 +1,14 @@
+[build]
+  publish = "."
+
+# Clean URLs for the Green Middle School lesson pages.
+# Status 200 = rewrite (URL stays clean in the address bar) instead of redirect.
+[[redirects]]
+  from = "/green"
+  to = "/green/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/greenteacher"
+  to = "/greenteacher/index.html"
+  status = 200
