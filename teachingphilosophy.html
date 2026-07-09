@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 	<title>Teaching Philosophy | Aaron Battle</title>
+	<meta name="description" content="Aaron Battle's teaching philosophy — safe, positive, and equitable classrooms where energy, collaboration, and high standards help every student grow." />
+	<meta property="og:title" content="Teaching Philosophy | Aaron Battle" />
+	<meta property="og:description" content="Safe, positive, and equitable classrooms where energy, collaboration, and high standards help every student grow." />
+	<meta property="og:type" content="website" />
 	<link rel="icon" href="./favicon.ico" sizes="any" />
 	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
 	<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
@@ -32,6 +36,12 @@
 			font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 			background: radial-gradient(circle at 20% 10%, #10172a 0%, var(--bg) 52%);
 			color: var(--text-main);
+			-webkit-tap-highlight-color: transparent;
+		}
+
+		h1,
+		h2 {
+			text-wrap: balance;
 		}
 
 		header.topbar {
@@ -41,7 +51,9 @@
 			right: 0;
 			z-index: 10;
 			padding: 1.35rem 2rem;
-			backdrop-filter: blur(6px);
+			padding-top: calc(1.35rem + env(safe-area-inset-top));
+			backdrop-filter: blur(10px);
+			background: linear-gradient(180deg, rgba(6, 7, 11, 0.72), rgba(6, 7, 11, 0.28) 78%, rgba(6, 7, 11, 0));
 		}
 
 		.topbar-inner {
@@ -82,7 +94,7 @@
 			font-size: 0.95rem;
 			letter-spacing: 0.01em;
 			position: relative;
-			padding-bottom: 0.15rem;
+			padding: 0.35rem 0.2rem;
 			transition: color 160ms ease;
 			white-space: nowrap;
 			min-width: 140px;
@@ -94,7 +106,7 @@
 			content: "";
 			position: absolute;
 			left: 0;
-			bottom: -0.2rem;
+			bottom: 0;
 			width: 100%;
 			height: 1.5px;
 			background: linear-gradient(90deg, var(--accent), rgba(123, 140, 255, 0));
@@ -178,29 +190,64 @@
 			border-top: 1px solid rgba(255, 255, 255, 0.08);
 		}
 
+		/* ── Scroll reveal ────────────────────────────────────────── */
+		.reveal {
+			opacity: 0;
+			transform: translateY(26px);
+			transition: opacity 700ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+		}
+
+		.reveal.is-visible {
+			opacity: 1;
+			transform: none;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.reveal {
+				opacity: 1;
+				transform: none;
+				transition: none;
+			}
+		}
+
 		footer {
-			padding: 1.7rem 1rem;
-			text-align: center;
-			font-size: 0.8rem;
-			color: rgba(154, 164, 194, 0.45);
+			position: relative;
+			z-index: 5;
+			padding: 2rem 2rem calc(1.5rem + env(safe-area-inset-bottom));
+			background: rgba(6, 7, 11, 0.95);
 			border-top: 1px solid rgba(255, 255, 255, 0.08);
+			backdrop-filter: blur(8px);
+		}
+
+		.footer-content {
+			max-width: 1200px;
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		.footer-credit {
+			font-size: 0.8rem;
+			color: rgba(154, 164, 194, 0.4);
+			letter-spacing: 0.02em;
+			margin: 0;
 		}
 
 		@media (max-width: 900px) {
 			header.topbar {
-				padding: 1rem 1rem 1.2rem;
+				padding: 0.85rem 0.8rem 0.9rem;
+				padding-top: calc(0.85rem + env(safe-area-inset-top));
 			}
 
 			.topbar-inner {
 				flex-direction: column;
-				gap: 0.6rem;
+				gap: 0.45rem;
 			}
 
 			.menu-left,
 			.menu-right {
 				justify-content: center;
 				flex-wrap: wrap;
-				gap: 0.9rem;
+				gap: 0.4rem;
 			}
 
 			.name {
@@ -216,11 +263,13 @@
 			}
 
 			.nav-link {
-				min-width: 110px;
+				min-width: 0;
+				font-size: 0.88rem;
+				padding: 0.45rem 0.7rem;
 			}
 
 			main {
-				padding-top: 10.5rem;
+				padding-top: 8.6rem;
 			}
 		}
 	</style>
@@ -239,7 +288,6 @@
 
 			<nav class="menu menu-right" aria-label="Primary portfolio links right">
 				<a class="nav-link" href="./teachingexperience.html">Teaching Experience</a>
-				<a class="nav-link" href="./lessonplans.html">Lesson Plans</a>
 				<a class="nav-link" href="./index.html#contact">Contact</a>
 			</nav>
 		</div>
@@ -253,52 +301,74 @@
 
 			<div class="philosophy-divider" aria-hidden="true"></div>
 
-			<div class="principle">
+			<div class="principle reveal">
 				<h2>Safe, Positive, and Equitable</h2>
 				<p>I create a learning environment where students feel comfortable, respected, and supported. The classroom should feel like a home. I also believe every student deserves access to music, regardless of background, and that equity is foundational to both safety and growth.</p>
 			</div>
 
-			<div class="principle">
+			<div class="principle reveal">
 				<h2>Goals That Fit the Student</h2>
 				<p>Each student and section learns differently. I set goals that are relevant and specialized, then adjust instruction to meet students where they are. Getting to know students personally is one of the most important parts of helping them succeed musically.</p>
 			</div>
 
-			<div class="principle">
+			<div class="principle reveal">
 				<h2>Collaboration Over Compliance</h2>
 				<p>I do not want rehearsals where students are simply told what to do. Students grow more when they help shape goals, expectations, and musical decisions. I prioritize student-teacher dialogue, student-student communication, and interaction across sections.</p>
 			</div>
 
-			<div class="principle">
+			<div class="principle reveal">
 				<h2>Diverse Repertoire and Context</h2>
 				<p>Students should encounter music by composers from many cultures, races, and genders. I also teach the cultural and historical context behind the music so performance is not just accurate, but informed and meaningful.</p>
 			</div>
 
-			<div class="principle">
+			<div class="principle reveal">
 				<h2>Challenge With Care</h2>
 				<p>Every student should be growing. No one should plateau, and no one should be pushed beyond what they can handle. My job is to choose and sequence music thoughtfully, then build the technical foundation so each student can progress with confidence.</p>
 			</div>
 
-			<div class="principle">
+			<div class="principle reveal">
 				<h2>Energy, Reflection, and Transfer</h2>
 				<p>Energy is contagious. Teaching with passion helps students build intrinsic motivation and a lasting love of music. I also make reflection central: students review recordings, revisit fundamentals, and learn to transfer concepts from one piece to the next rather than relearn from scratch.</p>
 			</div>
 
-			<div class="principle">
+			<div class="principle reveal">
 				<h2>Listening, Technology, and Choice</h2>
 				<p>Students improve faster when they regularly watch and listen to strong models. I use technology to support communication, feedback, and progress tracking, including video submissions with flexible options for students to perform live outside of class when preferred.</p>
 			</div>
 
-			<div class="principle">
+			<div class="principle reveal">
 				<h2>Students as People First</h2>
 				<p>I aim to support students beyond music. My classroom door is open, and students should feel welcome to ask questions, seek help, and be heard. Music is the vehicle that connects people, and that community should be a place where students can learn in the pace and style that is right for them.</p>
 			</div>
 		</section>
 	</main>
 
+	<script>
+		// Scroll reveal
+		(function () {
+			const els = document.querySelectorAll(".reveal");
+			const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			if (!("IntersectionObserver" in window) || reduced) {
+				els.forEach((el) => el.classList.add("is-visible"));
+				return;
+			}
+			const io = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add("is-visible");
+						io.unobserve(entry.target);
+					}
+				});
+			}, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+			els.forEach((el) => io.observe(el));
+		})();
+	</script>
+
 	<footer>
-		Website Designed and Engineered by Aaron Battle
-        <br>
-        Contact: battle.aaron.m@gmail.com
+		<div class="footer-content">
+			<p class="footer-credit">Website Designed and Engineered by Aaron Battle</p>
+			<p class="footer-credit">Contact: battle.aaron.m@gmail.com</p>
+		</div>
 	</footer>
 </body>
 </html>
