@@ -283,61 +283,98 @@
 			margin-bottom: 0.7rem;
 		}
 
-		.notes {
-			display: grid;
-			grid-template-columns: repeat(6, 1fr);
-			gap: 0.55rem;
+		/* ── The keyboard ── */
+		.keys {
+			position: relative;
+			display: flex;
+			height: 210px;
+			padding: 10px 10px 12px;
+			border-radius: 16px;
+			background: linear-gradient(180deg, #11141f, #090b12);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			box-shadow: inset 0 10px 18px rgba(0, 0, 0, 0.55);
+			user-select: none;
+			-webkit-user-select: none;
+			touch-action: manipulation;
 		}
 
-		.note {
+		.key {
 			font-family: var(--sym);
-			height: 64px;
-			border-radius: 14px;
-			border: 1px solid var(--line);
-			background: rgba(255, 255, 255, 0.04);
-			color: var(--text-main);
+			border: none;
 			cursor: pointer;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			justify-content: center;
+			justify-content: flex-end;
 			gap: 0.1rem;
-			transition: background 140ms ease, border-color 140ms ease, transform 100ms ease;
+			transition: background 120ms ease, transform 90ms ease, box-shadow 120ms ease;
 		}
 
-		.note.is-black {
-			background: rgba(6, 7, 11, 0.6);
-		}
-
-		.note:hover {
-			border-color: rgba(123, 140, 255, 0.6);
-		}
-
-		.note:active {
-			transform: scale(0.97);
-		}
-
-		.note:focus-visible,
-		.seg button:focus-visible,
-		.toggle input:focus-visible + span {
-			outline: 2px solid #dce2ff;
-			outline-offset: 2px;
-		}
-
-		.note[aria-pressed="true"] {
-			background: rgba(123, 140, 255, 0.28);
-			border-color: var(--accent);
-			box-shadow: 0 0 18px rgba(123, 140, 255, 0.35);
-		}
-
-		.note-main {
-			font-size: 1.3rem;
+		.key-white {
+			flex: 1;
+			margin: 0 2px;
+			padding-bottom: 0.9rem;
+			border-radius: 0 0 10px 10px;
+			background: linear-gradient(180deg, #d9def0 0%, #f7f8fd 18%, #ffffff 100%);
+			box-shadow: inset 0 -6px 0 #c9cfe4, 0 2px 4px rgba(0, 0, 0, 0.5);
+			color: #2a3150;
+			font-size: 1.05rem;
 			font-weight: 700;
 		}
 
-		.note-alt {
-			font-size: 0.78rem;
-			color: var(--text-muted);
+		.key-black {
+			position: absolute;
+			top: 10px;
+			z-index: 2;
+			width: calc((100% - 20px) / 7 * 0.6);
+			left: calc(10px + (100% - 20px) / 7 * (var(--at) - 0.3));
+			height: 60%;
+			padding-bottom: 0.6rem;
+			border-radius: 0 0 7px 7px;
+			background: linear-gradient(180deg, #1b1f2c 0%, #2c3142 85%, #3a4054 100%);
+			box-shadow: inset 0 -5px 0 #10131c, 0 4px 6px rgba(0, 0, 0, 0.6);
+			color: #e6ebff;
+			font-size: 0.82rem;
+			font-weight: 700;
+		}
+
+		.key-black .key-alt {
+			font-size: 0.68rem;
+			font-weight: 500;
+			color: #9aa4c2;
+		}
+
+		.key-white:hover {
+			background: linear-gradient(180deg, #d9def0 0%, #eef1ff 18%, #f4f6ff 100%);
+		}
+
+		.key-black:hover {
+			background: linear-gradient(180deg, #232838 0%, #363c52 85%, #444b62 100%);
+		}
+
+		.key:active {
+			transform: translateY(2px);
+		}
+
+		.key-white[aria-pressed="true"] {
+			background: linear-gradient(180deg, #aab5ff 0%, #c7cfff 30%, #dfe4ff 100%);
+			box-shadow: inset 0 -6px 0 #9aa5f0, 0 0 22px rgba(123, 140, 255, 0.55);
+			color: #1c2350;
+		}
+
+		.key-black[aria-pressed="true"] {
+			background: linear-gradient(180deg, #5a68d8 0%, #7b8cff 100%);
+			box-shadow: inset 0 -5px 0 #4a56b8, 0 0 22px rgba(123, 140, 255, 0.7);
+		}
+
+		.key-black[aria-pressed="true"] .key-alt {
+			color: #e6ebff;
+		}
+
+		.key:focus-visible,
+		.seg button:focus-visible {
+			outline: 2px solid #63ddff;
+			outline-offset: 2px;
 		}
 
 		.row {
@@ -376,37 +413,6 @@
 
 		.seg button[aria-pressed="true"] {
 			background: rgba(123, 140, 255, 0.32);
-		}
-
-		.stepper {
-			display: flex;
-			align-items: center;
-			gap: 0.6rem;
-		}
-
-		.stepper button {
-			width: 44px;
-			height: 44px;
-			border-radius: 12px;
-			border: 1px solid var(--line);
-			background: rgba(255, 255, 255, 0.04);
-			color: var(--text-main);
-			font: inherit;
-			font-size: 1.2rem;
-			font-weight: 700;
-			cursor: pointer;
-		}
-
-		.stepper button:hover {
-			border-color: rgba(123, 140, 255, 0.6);
-		}
-
-		.stepper output {
-			min-width: 6.5ch;
-			text-align: center;
-			font-size: 1.1rem;
-			font-weight: 700;
-			font-variant-numeric: tabular-nums;
 		}
 
 		input[type="range"] {
@@ -459,41 +465,6 @@
 			outline: 2px solid #dce2ff;
 			outline-offset: 2px;
 			border-radius: 6px;
-		}
-
-		.toggles {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 0.6rem;
-		}
-
-		.toggle {
-			position: relative;
-			cursor: pointer;
-		}
-
-		.toggle input {
-			position: absolute;
-			opacity: 0;
-			pointer-events: none;
-		}
-
-		.toggle span {
-			display: inline-flex;
-			align-items: center;
-			min-height: 44px;
-			padding: 0 1rem;
-			border-radius: 12px;
-			border: 1px solid var(--line);
-			background: rgba(255, 255, 255, 0.03);
-			font-weight: 600;
-			font-size: 0.92rem;
-			transition: background 140ms ease, border-color 140ms ease;
-		}
-
-		.toggle input:checked + span {
-			background: rgba(123, 140, 255, 0.28);
-			border-color: var(--accent);
 		}
 
 		.hint {
@@ -609,8 +580,20 @@
 				height: 72px;
 			}
 
-			.notes {
-				grid-template-columns: repeat(4, 1fr);
+			.keys {
+				height: 170px;
+				padding: 8px 6px 10px;
+			}
+
+			.key-black {
+				top: 8px;
+				width: calc((100% - 12px) / 7 * 0.62);
+				left: calc(6px + (100% - 12px) / 7 * (var(--at) - 0.31));
+			}
+
+			.key-white {
+				margin: 0 1.5px;
+				font-size: 0.95rem;
 			}
 
 			.row {
@@ -723,10 +706,7 @@
 					</button>
 				</div>
 
-				<div>
-					<p class="label" id="notesLabel">Note</p>
-					<div class="notes" id="notes" role="group" aria-labelledby="notesLabel"></div>
-				</div>
+				<div class="keys" id="keys" role="group" aria-label="Note"></div>
 
 				<div class="row">
 					<div>
@@ -734,35 +714,12 @@
 						<div class="seg" id="octaves" role="group" aria-labelledby="octLabel"></div>
 					</div>
 					<div>
-						<p class="label" id="toneLabel">Tone</p>
-						<div class="seg" id="tones" role="group" aria-labelledby="toneLabel">
-							<button type="button" data-tone="sine" aria-pressed="true">Pure</button>
-							<button type="button" data-tone="warm" aria-pressed="false">Warm</button>
-						</div>
-					</div>
-					<div>
 						<p class="label"><label for="volume">Volume</label></p>
 						<input type="range" id="volume" min="0" max="100" value="60" />
 					</div>
-					<div>
-						<p class="label" id="refLabel">Tuned to A =</p>
-						<div class="stepper" role="group" aria-labelledby="refLabel">
-							<button type="button" id="refDown" aria-label="Lower A by 1 Hz">−</button>
-							<output id="refOut">440 Hz</output>
-							<button type="button" id="refUp" aria-label="Raise A by 1 Hz">+</button>
-						</div>
-					</div>
 				</div>
 
-				<div>
-					<p class="label">Add</p>
-					<div class="toggles">
-						<label class="toggle"><input type="checkbox" id="addFifth" /><span>The fifth above</span></label>
-						<label class="toggle"><input type="checkbox" id="addLow" /><span>The octave below</span></label>
-					</div>
-				</div>
-
-				<p class="hint">Pure is a plain sine wave. Warm adds a few soft overtones so low notes still come through laptop and Chromebook speakers. <kbd>Space</kbd> starts and stops, <kbd>←</kbd> <kbd>→</kbd> change the note, <kbd>↑</kbd> <kbd>↓</kbd> change the octave. On an iPhone, switch the ringer on if you hear nothing.</p>
+				<p class="hint">A pure sine tone, tuned to A&nbsp;=&nbsp;440. <kbd>Space</kbd> starts and stops, <kbd>←</kbd> <kbd>→</kbd> change the note, <kbd>↑</kbd> <kbd>↓</kbd> change the octave. On an iPhone, switch the ringer on if you hear nothing.</p>
 			</section>
 		</section>
 	</main>
@@ -823,7 +780,7 @@
 		})();
 	</script>
 	<script>
-		// The drone
+		// The drone: one pure sine at A = 440.
 		(function () {
 			const NOTES = [
 				{ name: "C" },
@@ -840,19 +797,16 @@
 				{ name: "B" }
 			];
 			const OCTAVES = [1, 2, 3, 4, 5, 6];
+			const REF = 440;
 			const KEY = "tuningDrone.v1";
 
-			const state = { pc: 10, oct: 3, ref: 440, vol: 60, tone: "sine", fifth: false, low: false };
+			const state = { pc: 10, oct: 3, vol: 60 };
 			try {
 				const saved = JSON.parse(localStorage.getItem(KEY) || "null");
 				if (saved && typeof saved === "object") {
 					if (saved.pc >= 0 && saved.pc < 12) state.pc = saved.pc | 0;
 					if (OCTAVES.includes(saved.oct)) state.oct = saved.oct;
-					if (saved.ref >= 415 && saved.ref <= 466) state.ref = saved.ref | 0;
 					if (saved.vol >= 0 && saved.vol <= 100) state.vol = saved.vol | 0;
-					if (saved.tone === "sine" || saved.tone === "warm") state.tone = saved.tone;
-					state.fifth = !!saved.fifth;
-					state.low = !!saved.low;
 				}
 			} catch (e) {}
 			function save() {
@@ -861,22 +815,23 @@
 
 			const $ = (id) => document.getElementById(id);
 			const playBtn = $("play");
-			const notesEl = $("notes");
+			const keysEl = $("keys");
 			const octEl = $("octaves");
 			const volEl = $("volume");
 			const canvas = $("wave");
 			const g2d = canvas.getContext("2d");
 
-			// Frequency of a pitch class in an octave (scientific pitch: A4 = ref).
-			function freqOf(pc, oct, ref) {
+			// Scientific pitch: A4 = 440.
+			function freqOf(pc, oct) {
 				const midi = 12 * (oct + 1) + pc;
-				return ref * Math.pow(2, (midi - 69) / 12);
+				return REF * Math.pow(2, (midi - 69) / 12);
 			}
 
 			// ── Audio ──
-			let ctx = null, master = null, analyser = null, warmWave = null;
-			let voices = [];
+			let ctx = null, master = null, analyser = null;
+			let voice = null;
 			let playing = false;
+			const LEVEL = 0.5;
 
 			function ensureAudio() {
 				if (ctx) return;
@@ -886,21 +841,10 @@
 				try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
 				master = ctx.createGain();
 				master.gain.value = volGain();
-				const comp = ctx.createDynamicsCompressor();
-				comp.threshold.value = -6;
-				comp.knee.value = 6;
-				comp.ratio.value = 6;
-				comp.attack.value = 0.005;
-				comp.release.value = 0.2;
 				analyser = ctx.createAnalyser();
 				analyser.fftSize = 2048;
-				master.connect(comp);
-				comp.connect(analyser);
+				master.connect(analyser);
 				analyser.connect(ctx.destination);
-				// Soft overtones for small speakers: 2nd to 5th harmonics, falling off.
-				const real = new Float32Array([0, 0, 0, 0, 0, 0]);
-				const imag = new Float32Array([0, 1, 0.42, 0.2, 0.09, 0.04]);
-				warmWave = ctx.createPeriodicWave(real, imag);
 			}
 
 			function volGain() {
@@ -908,54 +852,32 @@
 				return v * v * 0.9;
 			}
 
-			// The tones that should sound right now: [frequency, level].
-			function targets() {
-				const f = freqOf(state.pc, state.oct, state.ref);
-				const list = [[f, 1]];
-				if (state.fifth) list.push([f * Math.pow(2, 7 / 12), 0.6]);
-				if (state.low) list.push([f / 2, 0.75]);
-				const sum = list.reduce((s, t) => s + t[1], 0);
-				const scale = 0.5 / Math.max(1, sum * 0.8);
-				return list.map(([fr, lv]) => [fr, lv * scale]);
-			}
-
-			function makeVoice(freq, level, t) {
+			function makeVoice(freq, t) {
 				const osc = ctx.createOscillator();
-				if (state.tone === "warm") osc.setPeriodicWave(warmWave);
-				else osc.type = "sine";
+				osc.type = "sine";
 				osc.frequency.value = freq;
 				const g = ctx.createGain();
 				g.gain.setValueAtTime(0, t);
-				g.gain.setTargetAtTime(level, t, 0.04);
+				g.gain.setTargetAtTime(LEVEL, t, 0.04);
 				osc.connect(g);
 				g.connect(master);
 				osc.start(t);
 				return { osc, g };
 			}
 
-			function fadeOut(list, t) {
-				list.forEach((v) => {
-					v.g.gain.cancelScheduledValues(t);
-					v.g.gain.setTargetAtTime(0, t, 0.035);
-					v.osc.stop(t + 0.4);
-				});
+			function fadeOut(v, t) {
+				if (!v) return;
+				v.g.gain.cancelScheduledValues(t);
+				v.g.gain.setTargetAtTime(0, t, 0.035);
+				v.osc.stop(t + 0.4);
 			}
 
-			// Crossfade from whatever is sounding to the current settings.
+			// Crossfade from whatever is sounding to the current note.
 			function sound() {
 				if (!playing) return;
 				const t = ctx.currentTime;
-				fadeOut(voices, t);
-				voices = targets().map(([f, lv]) => makeVoice(f, lv, t));
-			}
-
-			// Retune in place (A reference): a short glide, no restart.
-			function retune() {
-				if (!playing) return;
-				const t = ctx.currentTime;
-				const tg = targets();
-				if (tg.length !== voices.length) return sound();
-				voices.forEach((v, i) => v.osc.frequency.setTargetAtTime(tg[i][0], t, 0.03));
+				fadeOut(voice, t);
+				voice = makeVoice(freqOf(state.pc, state.oct), t);
 			}
 
 			function start() {
@@ -970,8 +892,8 @@
 			function stop() {
 				if (!ctx) return;
 				playing = false;
-				fadeOut(voices, ctx.currentTime);
-				voices = [];
+				fadeOut(voice, ctx.currentTime);
+				voice = null;
 				paintPlay();
 			}
 
@@ -1034,14 +956,9 @@
 			}
 
 			// ── UI ──
-			function noteLabel() {
-				return NOTES[state.pc].name + "<sub>" + state.oct + "</sub>";
-			}
-
 			function paintReadout() {
-				$("noteName").innerHTML = noteLabel();
-				$("noteHz").textContent = freqOf(state.pc, state.oct, state.ref).toFixed(2) + " Hz";
-				$("refOut").textContent = state.ref + " Hz";
+				$("noteName").innerHTML = NOTES[state.pc].name + "<sub>" + state.oct + "</sub>";
+				$("noteHz").textContent = freqOf(state.pc, state.oct).toFixed(2) + " Hz";
 				document.title = (playing ? NOTES[state.pc].name + state.oct + " · " : "") + "Tuning Drone | Aaron Battle";
 			}
 
@@ -1053,31 +970,41 @@
 			}
 
 			function paintButtons() {
-				notesEl.querySelectorAll(".note").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.pc === state.pc)));
+				keysEl.querySelectorAll(".key").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.pc === state.pc)));
 				octEl.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.oct === state.oct)));
-				$("tones").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tone === state.tone)));
-				$("addFifth").checked = state.fifth;
-				$("addLow").checked = state.low;
+				// The C key carries the octave number, like a printed keyboard.
+				const c = keysEl.querySelector('[data-pc="0"] .key-name');
+				if (c) c.textContent = "C" + state.oct;
 				volEl.value = state.vol;
 				volEl.style.setProperty("--fill", state.vol + "%");
 				paintReadout();
 			}
 
+			// A one-octave keyboard: seven white keys in a row, five black keys laid over the gaps.
+			let white = 0;
 			NOTES.forEach((n, pc) => {
 				const b = document.createElement("button");
 				b.type = "button";
-				b.className = "note" + (n.alt ? " is-black" : "");
 				b.dataset.pc = pc;
 				b.setAttribute("aria-label", n.alt ? n.name + " or " + n.alt : n.name);
-				b.innerHTML = '<span class="note-main">' + n.name + "</span>" + (n.alt ? '<span class="note-alt">' + n.alt + "</span>" : "");
+				if (n.alt) {
+					b.className = "key key-black";
+					// Centred on the line between the white key before it and the one after.
+					b.style.setProperty("--at", white);
+					b.innerHTML = '<span class="key-name">' + n.name + '</span><span class="key-alt">' + n.alt + "</span>";
+				} else {
+					b.className = "key key-white";
+					b.innerHTML = '<span class="key-name">' + n.name + "</span>";
+					white++;
+				}
 				b.addEventListener("click", () => {
 					state.pc = pc;
 					save();
 					paintButtons();
-					// Picking a note is a request to hear it.
+					// Pressing a key is a request to hear it.
 					playing ? sound() : start();
 				});
-				notesEl.appendChild(b);
+				keysEl.appendChild(b);
 			});
 
 			OCTAVES.forEach((o) => {
@@ -1110,15 +1037,6 @@
 				sound();
 			}
 
-			$("tones").addEventListener("click", (e) => {
-				const b = e.target.closest("button");
-				if (!b || b.dataset.tone === state.tone) return;
-				state.tone = b.dataset.tone;
-				save();
-				paintButtons();
-				sound();
-			});
-
 			volEl.addEventListener("input", () => {
 				state.vol = +volEl.value;
 				volEl.style.setProperty("--fill", state.vol + "%");
@@ -1126,27 +1044,14 @@
 				save();
 			});
 
-			function setRef(r) {
-				state.ref = Math.max(415, Math.min(466, r));
-				save();
-				paintReadout();
-				retune();
-			}
-			$("refDown").addEventListener("click", () => setRef(state.ref - 1));
-			$("refUp").addEventListener("click", () => setRef(state.ref + 1));
-
-			$("addFifth").addEventListener("change", (e) => { state.fifth = e.target.checked; save(); sound(); });
-			$("addLow").addEventListener("change", (e) => { state.low = e.target.checked; save(); sound(); });
-
 			playBtn.addEventListener("click", toggle);
 
 			document.addEventListener("keydown", (e) => {
 				if (e.metaKey || e.ctrlKey || e.altKey) return;
 				const tag = e.target && e.target.tagName;
 				const onRange = tag === "INPUT" && e.target.type === "range";
-				const onCheck = tag === "INPUT" && e.target.type === "checkbox";
-				// Space is always start/stop, even after a note button was clicked (it keeps focus).
-				if (e.code === "Space" && !onCheck && tag !== "A") {
+				// Space is always start/stop, even after a key was clicked (it keeps focus).
+				if (e.code === "Space" && tag !== "A") {
 					e.preventDefault();
 					if (!e.repeat) toggle();
 				} else if (!onRange && e.key === "ArrowRight") { e.preventDefault(); stepNote(1); }
@@ -1155,7 +1060,7 @@
 				else if (!onRange && e.key === "ArrowDown") { e.preventDefault(); setOctave(state.oct - 1); }
 			});
 
-			// A focused button also clicks on Space's keyup; that would undo the toggle above.
+			// A focused button also clicks on the keyup of Space, which would undo the toggle above.
 			document.addEventListener("keyup", (e) => {
 				const t = e.target;
 				if (e.code === "Space" && t && t.tagName === "BUTTON") e.preventDefault();
