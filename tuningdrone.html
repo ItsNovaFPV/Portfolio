@@ -3,9 +3,9 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-	<title>Tuning Drone | Aaron Battle</title>
+	<title>Tuning Drone | Mr. Battle</title>
 	<meta name="description" content="A free tuning drone for band and orchestra rehearsals. Pick any note and octave and play a steady sine tone, with no account and no time limit." />
-	<meta property="og:title" content="Tuning Drone | Aaron Battle" />
+	<meta property="og:title" content="Tuning Drone | Mr. Battle" />
 	<meta property="og:description" content="A free tuning drone: any note, any octave, a steady sine tone. No account, no limit." />
 	<meta property="og:type" content="website" />
 	<link rel="icon" href="./favicon.ico" sizes="any" />
@@ -170,6 +170,14 @@
 			font-size: clamp(1rem, 2vw, 1.15rem);
 			line-height: 1.75;
 			color: var(--text-muted);
+		}
+
+		.dedication {
+			margin-top: 0.9rem;
+			font-size: 0.95rem;
+			font-style: italic;
+			letter-spacing: 0.02em;
+			color: var(--accent);
 		}
 
 		/* ── The drone ───────────────────────────────────────────── */
@@ -682,7 +690,7 @@
 			</nav>
 
 			<a href="./index.html#hero" style="text-decoration: none; color: inherit;">
-				<h1 class="name">Aaron Battle</h1>
+				<h1 class="name">Mr. Battle</h1>
 			</a>
 
 			<nav class="menu menu-right" aria-label="Primary portfolio links right">
@@ -698,6 +706,7 @@
 			<section class="reveal">
 				<h1 class="hero-title">Tuning Drone</h1>
 				<p class="hero-subtitle">A steady tone to tune and play against. Tap a note to start it. It keeps sounding until you stop it, with no account and no time limit.</p>
+				<p class="dedication">Dedicated to Green Middle School 6th Grade Beginning Brass</p>
 			</section>
 
 			<section class="drone reveal" aria-label="Drone controls">
@@ -980,7 +989,7 @@
 				const name = NAMES[pcOf(state.midi)].name, oct = octOf(state.midi);
 				$("noteName").innerHTML = name + "<sub>" + oct + "</sub>";
 				$("noteHz").textContent = freqOf(state.midi).toFixed(2) + " Hz";
-				document.title = (playing ? name + oct + " · " : "") + "Tuning Drone | Aaron Battle";
+				document.title = (playing ? name + oct + " · " : "") + "Tuning Drone | Mr. Battle";
 			}
 
 			function paintPlay() {
@@ -1120,7 +1129,7 @@
 
 	<footer>
 		<div class="footer-content">
-			<p class="footer-credit">Website Designed and Engineered by Aaron Battle</p>
+			<p class="footer-credit">Website Designed and Engineered by Mr. Battle</p>
 			<p class="footer-credit">Contact: battle.aaron.m@gmail.com</p>
 		</div>
 	</footer>
