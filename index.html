@@ -4,9 +4,9 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 	<title>Aaron Battle Music</title>
-	<meta name="description" content="Aaron Battle — music educator, designer, and arranger. Band Director at Green Local Schools with experience across percussion education, drum corps audio, and performance design." />
+	<meta name="description" content="Aaron Battle — music educator, designer, and arranger. Instrumental and general music teacher and percussion director at Green Local Schools, and founder of RepSimulator.com, with experience across percussion education, drum corps audio, and performance design." />
 	<meta property="og:title" content="Aaron Battle Music" />
-	<meta property="og:description" content="Music educator, designer, and arranger. Band Director at Green Local Schools." />
+	<meta property="og:description" content="Music educator, designer, and arranger. Music teacher and percussion director at Green Local Schools." />
 	<meta property="og:type" content="website" />
 	<link rel="icon" href="./favicon.ico" sizes="any" />
 	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
@@ -745,6 +745,68 @@
 				padding: 2.5rem 1.8rem;
 			}
 		}
+
+		/* Phones: the five links share rows under the name instead of one row per menu. */
+		@media (max-width: 900px) {
+			.topbar-inner {
+				flex-direction: row;
+				flex-wrap: wrap;
+				justify-content: center;
+				column-gap: 0.1rem;
+				row-gap: 0.1rem;
+			}
+
+			.topbar-inner > a {
+				flex-basis: 100%;
+			}
+
+			.menu {
+				display: contents;
+			}
+
+			.nav-link {
+				padding: 0.45rem;
+				font-size: 0.84rem;
+			}
+		}
+
+		/* Five links: one centred row from 1221px, the name above the links between 901 and 1220px. */
+		@media (min-width: 1221px) {
+			.topbar-inner > .menu {
+				flex: 1 1 0;
+			}
+
+			.topbar-inner > .menu-left {
+				justify-content: flex-end;
+			}
+
+			.nav-link {
+				min-width: 120px;
+			}
+		}
+
+		@media (min-width: 901px) and (max-width: 1220px) {
+			header.topbar {
+				padding-top: calc(0.9rem + env(safe-area-inset-top));
+				padding-bottom: 0.9rem;
+			}
+
+			.topbar-inner {
+				flex-wrap: wrap;
+				row-gap: 0.3rem;
+				column-gap: 1.2rem;
+			}
+
+			.topbar-inner > a {
+				order: -1;
+				flex-basis: 100%;
+			}
+
+			.nav-link {
+				min-width: 0;
+				padding: 0.35rem 0.6rem;
+			}
+		}
 	</style>
 </head>
 <body>
@@ -790,6 +852,7 @@
 
 			<nav class="menu menu-right" aria-label="Primary portfolio links right">
 				<a class="nav-link" href="./teachingexperience.html">Teaching Experience</a>
+				<a class="nav-link" href="./tuningdrone.html">Tuning Drone</a>
 				<a class="nav-link" href="#contact">Contact</a>
 			</nav>
 		</div>

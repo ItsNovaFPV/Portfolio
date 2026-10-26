@@ -4,9 +4,9 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 	<title>Teaching Experience | Aaron Battle</title>
-	<meta name="description" content="Aaron Battle's teaching experience — Band Director at Green Local Schools, drum corps audio technician, percussion director, clinician, and educator." />
+	<meta name="description" content="Aaron Battle's teaching experience — Instrumental and general music teacher and percussion director at Green Local Schools, founder of RepSimulator.com, drum corps audio technician, clinician, and educator." />
 	<meta property="og:title" content="Teaching Experience | Aaron Battle" />
-	<meta property="og:description" content="Band Director at Green Local Schools, drum corps audio technician, percussion director, clinician, and educator." />
+	<meta property="og:description" content="Instrumental and general music teacher and percussion director at Green Local Schools, founder of RepSimulator.com, drum corps audio technician, clinician, and educator." />
 	<meta property="og:type" content="website" />
 	<link rel="icon" href="./favicon.ico" sizes="any" />
 	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
@@ -249,6 +249,25 @@
 			color: var(--text-muted);
 		}
 
+		.role-link {
+			color: inherit;
+			text-decoration: underline;
+			text-decoration-color: rgba(123, 140, 255, 0.6);
+			text-underline-offset: 3px;
+		}
+
+		.role-link:hover {
+			color: #e6ebff;
+		}
+
+		.role-desc {
+			margin-top: 0.4rem;
+			max-width: 58ch;
+			font-size: 0.9rem;
+			line-height: 1.6;
+			color: var(--text-muted);
+		}
+
 		.role-term {
 			flex-shrink: 0;
 			font-size: 0.8rem;
@@ -465,6 +484,68 @@
 				padding-left: 0.9rem;
 			}
 		}
+
+		/* Phones: the five links share rows under the name instead of one row per menu. */
+		@media (max-width: 900px) {
+			.topbar-inner {
+				flex-direction: row;
+				flex-wrap: wrap;
+				justify-content: center;
+				column-gap: 0.1rem;
+				row-gap: 0.1rem;
+			}
+
+			.topbar-inner > a {
+				flex-basis: 100%;
+			}
+
+			.menu {
+				display: contents;
+			}
+
+			.nav-link {
+				padding: 0.45rem;
+				font-size: 0.84rem;
+			}
+		}
+
+		/* Five links: one centred row from 1221px, the name above the links between 901 and 1220px. */
+		@media (min-width: 1221px) {
+			.topbar-inner > .menu {
+				flex: 1 1 0;
+			}
+
+			.topbar-inner > .menu-left {
+				justify-content: flex-end;
+			}
+
+			.nav-link {
+				min-width: 120px;
+			}
+		}
+
+		@media (min-width: 901px) and (max-width: 1220px) {
+			header.topbar {
+				padding-top: calc(0.9rem + env(safe-area-inset-top));
+				padding-bottom: 0.9rem;
+			}
+
+			.topbar-inner {
+				flex-wrap: wrap;
+				row-gap: 0.3rem;
+				column-gap: 1.2rem;
+			}
+
+			.topbar-inner > a {
+				order: -1;
+				flex-basis: 100%;
+			}
+
+			.nav-link {
+				min-width: 0;
+				padding: 0.35rem 0.6rem;
+			}
+		}
 	</style>
 </head>
 <body>
@@ -483,6 +564,7 @@
 
 			<nav class="menu menu-right" aria-label="Primary portfolio links right">
 				<a class="nav-link" href="./teachingexperience.html">Teaching Experience</a>
+				<a class="nav-link" href="./tuningdrone.html">Tuning Drone</a>
 				<a class="nav-link" href="./index.html#contact">Contact</a>
 			</nav>
 		</div>
@@ -500,8 +582,23 @@
 				<ul class="timeline-list">
 					<li class="timeline-item is-current">
 						<div>
-							<p class="role-title">Band Director</p>
+							<p class="role-title">Instrumental &amp; General Music Teacher</p>
+							<p class="role-org">Green Middle School, Green Local Schools</p>
+						</div>
+						<p class="role-term">2026 – Present</p>
+					</li>
+					<li class="timeline-item is-current">
+						<div>
+							<p class="role-title">Percussion Director</p>
 							<p class="role-org">Green Local Schools</p>
+						</div>
+						<p class="role-term">2026 – Present</p>
+					</li>
+					<li class="timeline-item is-current">
+						<div>
+							<p class="role-title">Founder</p>
+							<p class="role-org"><a class="role-link" href="https://repsimulator.com" target="_blank" rel="noopener">RepSimulator.com</a></p>
+							<p class="role-desc">A practice platform and social network for marching percussionists, with more than 1,000 drummers. Players rep their music against a metronome that follows the score, track their practice over time, and film and share their reps with friends and their section. A classroom edition lets directors assign music and follow their students' practice.</p>
 						</div>
 						<p class="role-term">2026 – Present</p>
 					</li>

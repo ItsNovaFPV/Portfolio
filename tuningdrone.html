@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+	<title>Tuning Drone | Aaron Battle</title>
+	<meta name="description" content="A free tuning drone for band and orchestra rehearsals. Pick any note and octave and play a steady sine tone, with no account and no time limit." />
+	<meta property="og:title" content="Tuning Drone | Aaron Battle" />
+	<meta property="og:description" content="A free tuning drone: any note, any octave, a steady sine tone. No account, no limit." />
+	<meta property="og:type" content="website" />
+	<link rel="icon" href="./favicon.ico" sizes="any" />
+	<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png" />
+	<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+	<link rel="manifest" href="./site.webmanifest" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet" />
+	<style>
+		:root {
+			color-scheme: dark;
+			--bg: #06070b;
+			--text-main: #f3f5ff;
+			--text-muted: #9aa4c2;
+			--accent: #7b8cff;
+			--accent-2: #63ddff;
+			--line: rgba(255, 255, 255, 0.14);
+			--sym: "Inter", "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols2", system-ui, sans-serif;
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			min-height: 100vh;
+			font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			background: radial-gradient(circle at 20% 10%, #10172a 0%, var(--bg) 52%);
+			color: var(--text-main);
+			overflow-x: hidden;
+			-webkit-tap-highlight-color: transparent;
+		}
+
+		h1,
+		h2,
+		h3 {
+			text-wrap: balance;
+		}
+
+		#particles-js {
+			position: fixed;
+			inset: 0;
+			z-index: -1;
+			pointer-events: none;
+		}
+
+		header.topbar {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 10;
+			padding: 1.35rem 2rem;
+			padding-top: calc(1.35rem + env(safe-area-inset-top));
+			backdrop-filter: blur(10px);
+			background: linear-gradient(180deg, rgba(6, 7, 11, 0.72), rgba(6, 7, 11, 0.28) 78%, rgba(6, 7, 11, 0));
+		}
+
+		.topbar-inner {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 3.6rem;
+		}
+
+		.name {
+			font-size: clamp(1.1rem, 3.5vw, 1.9rem);
+			font-weight: 800;
+			letter-spacing: -0.02em;
+			text-align: center;
+			white-space: nowrap;
+			order: 1;
+		}
+
+		.menu {
+			display: flex;
+			gap: 1.2rem;
+			align-items: center;
+		}
+
+		.menu-left {
+			order: 0;
+		}
+
+		.menu-right {
+			order: 2;
+		}
+
+		.nav-link {
+			text-decoration: none;
+			color: var(--text-main);
+			font-weight: 500;
+			font-size: 0.95rem;
+			letter-spacing: 0.01em;
+			position: relative;
+			padding: 0.35rem 0.2rem;
+			transition: color 160ms ease;
+			white-space: nowrap;
+			min-width: 140px;
+			text-align: center;
+			cursor: pointer;
+		}
+
+		.nav-link::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			height: 1.5px;
+			background: linear-gradient(90deg, var(--accent), rgba(123, 140, 255, 0));
+			transform: scaleX(0);
+			transform-origin: left;
+			transition: transform 170ms ease;
+		}
+
+		.nav-link:hover,
+		.nav-link:focus-visible,
+		.nav-link[aria-current="page"] {
+			color: #dce2ff;
+			outline: none;
+		}
+
+		.nav-link:hover::after,
+		.nav-link:focus-visible::after,
+		.nav-link[aria-current="page"]::after {
+			transform: scaleX(1);
+		}
+
+		main {
+			max-width: 980px;
+			margin: 0 auto;
+			padding: clamp(7.5rem, 12vh, 8.5rem) clamp(1rem, 4vw, 1.5rem) clamp(3rem, 8vh, 5rem);
+		}
+
+		.drone-page {
+			display: flex;
+			flex-direction: column;
+			gap: clamp(1.6rem, 4vw, 2.4rem);
+		}
+
+		.hero-title {
+			font-size: clamp(2.2rem, 6.4vw, 4rem);
+			line-height: 1.04;
+			margin-bottom: 0.8rem;
+			background: linear-gradient(135deg, #dce2ff, var(--accent));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+
+		.hero-subtitle {
+			max-width: 64ch;
+			font-size: clamp(1rem, 2vw, 1.15rem);
+			line-height: 1.75;
+			color: var(--text-muted);
+		}
+
+		/* ── The drone ───────────────────────────────────────────── */
+		.drone {
+			background: linear-gradient(180deg, rgba(14, 16, 24, 0.72), rgba(14, 16, 24, 0.45));
+			border: 1px solid var(--line);
+			border-radius: 22px;
+			padding: clamp(1.2rem, 3vw, 2rem);
+			backdrop-filter: blur(10px);
+			display: grid;
+			gap: 1.6rem;
+		}
+
+		.readout {
+			display: grid;
+			grid-template-columns: auto 1fr auto;
+			align-items: center;
+			gap: clamp(1rem, 3vw, 2rem);
+		}
+
+		.readout-note {
+			font-family: var(--sym);
+			font-size: clamp(3.4rem, 11vw, 5.6rem);
+			font-weight: 800;
+			line-height: 1;
+			letter-spacing: -0.03em;
+			min-width: 2.6ch;
+			font-variant-numeric: tabular-nums;
+		}
+
+		.readout-note sub {
+			font-size: 0.42em;
+			font-weight: 700;
+			vertical-align: baseline;
+			color: var(--text-muted);
+			margin-left: 0.04em;
+		}
+
+		.readout-hz {
+			margin-top: 0.35rem;
+			font-size: 0.95rem;
+			color: var(--text-muted);
+			font-variant-numeric: tabular-nums;
+		}
+
+		.wave {
+			width: 100%;
+			height: 96px;
+			display: block;
+			border-radius: 14px;
+			background: rgba(6, 7, 11, 0.55);
+			border: 1px solid rgba(255, 255, 255, 0.07);
+		}
+
+		.play {
+			width: clamp(84px, 16vw, 108px);
+			height: clamp(84px, 16vw, 108px);
+			border-radius: 50%;
+			border: none;
+			cursor: pointer;
+			display: grid;
+			place-items: center;
+			color: #06070b;
+			background: linear-gradient(135deg, #dce2ff, var(--accent));
+			box-shadow: 0 10px 30px rgba(123, 140, 255, 0.35);
+			transition: transform 120ms ease, box-shadow 160ms ease;
+		}
+
+		.play:hover {
+			box-shadow: 0 12px 38px rgba(123, 140, 255, 0.5);
+		}
+
+		.play:active {
+			transform: scale(0.96);
+		}
+
+		.play:focus-visible {
+			outline: 2px solid #dce2ff;
+			outline-offset: 4px;
+		}
+
+		.play svg {
+			width: 38%;
+			height: 38%;
+		}
+
+		.play .i-stop,
+		.play.is-on .i-play {
+			display: none;
+		}
+
+		.play.is-on .i-stop {
+			display: block;
+		}
+
+		.play.is-on {
+			animation: breathe 2.4s ease-in-out infinite;
+		}
+
+		@keyframes breathe {
+			50% {
+				box-shadow: 0 10px 44px rgba(99, 221, 255, 0.55);
+			}
+		}
+
+		.label {
+			font-size: 0.78rem;
+			letter-spacing: 0.16em;
+			text-transform: uppercase;
+			color: #bdc6e8;
+			margin-bottom: 0.7rem;
+		}
+
+		.notes {
+			display: grid;
+			grid-template-columns: repeat(6, 1fr);
+			gap: 0.55rem;
+		}
+
+		.note {
+			font-family: var(--sym);
+			height: 64px;
+			border-radius: 14px;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.04);
+			color: var(--text-main);
+			cursor: pointer;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 0.1rem;
+			transition: background 140ms ease, border-color 140ms ease, transform 100ms ease;
+		}
+
+		.note.is-black {
+			background: rgba(6, 7, 11, 0.6);
+		}
+
+		.note:hover {
+			border-color: rgba(123, 140, 255, 0.6);
+		}
+
+		.note:active {
+			transform: scale(0.97);
+		}
+
+		.note:focus-visible,
+		.seg button:focus-visible,
+		.toggle input:focus-visible + span {
+			outline: 2px solid #dce2ff;
+			outline-offset: 2px;
+		}
+
+		.note[aria-pressed="true"] {
+			background: rgba(123, 140, 255, 0.28);
+			border-color: var(--accent);
+			box-shadow: 0 0 18px rgba(123, 140, 255, 0.35);
+		}
+
+		.note-main {
+			font-size: 1.3rem;
+			font-weight: 700;
+		}
+
+		.note-alt {
+			font-size: 0.78rem;
+			color: var(--text-muted);
+		}
+
+		.row {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1.4rem 2rem;
+		}
+
+		.seg {
+			display: flex;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			overflow: hidden;
+		}
+
+		.seg button {
+			flex: 1;
+			min-height: 44px;
+			border: none;
+			border-left: 1px solid rgba(255, 255, 255, 0.08);
+			background: rgba(255, 255, 255, 0.03);
+			color: var(--text-main);
+			font: inherit;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background 140ms ease;
+		}
+
+		.seg button:first-child {
+			border-left: none;
+		}
+
+		.seg button:hover {
+			background: rgba(123, 140, 255, 0.12);
+		}
+
+		.seg button[aria-pressed="true"] {
+			background: rgba(123, 140, 255, 0.32);
+		}
+
+		.stepper {
+			display: flex;
+			align-items: center;
+			gap: 0.6rem;
+		}
+
+		.stepper button {
+			width: 44px;
+			height: 44px;
+			border-radius: 12px;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.04);
+			color: var(--text-main);
+			font: inherit;
+			font-size: 1.2rem;
+			font-weight: 700;
+			cursor: pointer;
+		}
+
+		.stepper button:hover {
+			border-color: rgba(123, 140, 255, 0.6);
+		}
+
+		.stepper output {
+			min-width: 6.5ch;
+			text-align: center;
+			font-size: 1.1rem;
+			font-weight: 700;
+			font-variant-numeric: tabular-nums;
+		}
+
+		input[type="range"] {
+			-webkit-appearance: none;
+			appearance: none;
+			width: 100%;
+			height: 44px;
+			background: transparent;
+			cursor: pointer;
+		}
+
+		input[type="range"]::-webkit-slider-runnable-track {
+			height: 6px;
+			border-radius: 3px;
+			background: linear-gradient(90deg, var(--accent) var(--fill, 50%), rgba(255, 255, 255, 0.14) var(--fill, 50%));
+		}
+
+		input[type="range"]::-moz-range-track {
+			height: 6px;
+			border-radius: 3px;
+			background: rgba(255, 255, 255, 0.14);
+		}
+
+		input[type="range"]::-moz-range-progress {
+			height: 6px;
+			border-radius: 3px;
+			background: var(--accent);
+		}
+
+		input[type="range"]::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			width: 22px;
+			height: 22px;
+			margin-top: -8px;
+			border-radius: 50%;
+			background: #dce2ff;
+			border: none;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+		}
+
+		input[type="range"]::-moz-range-thumb {
+			width: 22px;
+			height: 22px;
+			border-radius: 50%;
+			background: #dce2ff;
+			border: none;
+		}
+
+		input[type="range"]:focus-visible {
+			outline: 2px solid #dce2ff;
+			outline-offset: 2px;
+			border-radius: 6px;
+		}
+
+		.toggles {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.6rem;
+		}
+
+		.toggle {
+			position: relative;
+			cursor: pointer;
+		}
+
+		.toggle input {
+			position: absolute;
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.toggle span {
+			display: inline-flex;
+			align-items: center;
+			min-height: 44px;
+			padding: 0 1rem;
+			border-radius: 12px;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.03);
+			font-weight: 600;
+			font-size: 0.92rem;
+			transition: background 140ms ease, border-color 140ms ease;
+		}
+
+		.toggle input:checked + span {
+			background: rgba(123, 140, 255, 0.28);
+			border-color: var(--accent);
+		}
+
+		.hint {
+			font-size: 0.85rem;
+			line-height: 1.6;
+			color: var(--text-muted);
+		}
+
+		.hint kbd {
+			font-family: inherit;
+			font-size: 0.78rem;
+			padding: 0.1rem 0.4rem;
+			border-radius: 6px;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.05);
+			color: var(--text-main);
+		}
+
+		.reveal {
+			opacity: 0;
+			transform: translateY(26px);
+			transition: opacity 700ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+		}
+
+		.reveal.is-visible {
+			opacity: 1;
+			transform: none;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.reveal {
+				opacity: 1;
+				transform: none;
+				transition: none;
+			}
+
+			.play.is-on {
+				animation: none;
+			}
+		}
+
+		footer {
+			position: relative;
+			z-index: 5;
+			padding: 2rem 2rem calc(1.5rem + env(safe-area-inset-bottom));
+			background: rgba(6, 7, 11, 0.95);
+			border-top: 1px solid rgba(255, 255, 255, 0.08);
+			backdrop-filter: blur(8px);
+		}
+
+		.footer-content {
+			max-width: 1200px;
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		.footer-credit {
+			font-size: 0.8rem;
+			color: rgba(154, 164, 194, 0.4);
+			letter-spacing: 0.02em;
+			margin: 0;
+		}
+
+		@media (max-width: 900px) {
+			header.topbar {
+				padding: 0.85rem 0.8rem 0.9rem;
+				padding-top: calc(0.85rem + env(safe-area-inset-top));
+			}
+
+			.topbar-inner {
+				flex-direction: column;
+				gap: 0.45rem;
+			}
+
+			.menu-left,
+			.menu-right {
+				justify-content: center;
+				flex-wrap: wrap;
+				gap: 0.4rem;
+			}
+
+			.name {
+				order: 0;
+			}
+
+			.menu-left {
+				order: 1;
+			}
+
+			.menu-right {
+				order: 2;
+			}
+
+			.nav-link {
+				min-width: 0;
+				font-size: 0.88rem;
+				padding: 0.45rem 0.7rem;
+			}
+
+			main {
+				padding-top: 8.6rem;
+			}
+		}
+
+		@media (max-width: 640px) {
+			.readout {
+				grid-template-columns: 1fr auto;
+			}
+
+			.wave {
+				grid-column: 1 / -1;
+				order: 3;
+				height: 72px;
+			}
+
+			.notes {
+				grid-template-columns: repeat(4, 1fr);
+			}
+
+			.row {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		/* Phones: the five links share rows under the name instead of one row per menu. */
+		@media (max-width: 900px) {
+			.topbar-inner {
+				flex-direction: row;
+				flex-wrap: wrap;
+				justify-content: center;
+				column-gap: 0.1rem;
+				row-gap: 0.1rem;
+			}
+
+			.topbar-inner > a {
+				flex-basis: 100%;
+			}
+
+			.menu {
+				display: contents;
+			}
+
+			.nav-link {
+				padding: 0.45rem;
+				font-size: 0.84rem;
+			}
+		}
+
+		/* Five links: one centred row from 1221px, the name above the links between 901 and 1220px. */
+		@media (min-width: 1221px) {
+			.topbar-inner > .menu {
+				flex: 1 1 0;
+			}
+
+			.topbar-inner > .menu-left {
+				justify-content: flex-end;
+			}
+
+			.nav-link {
+				min-width: 120px;
+			}
+		}
+
+		@media (min-width: 901px) and (max-width: 1220px) {
+			header.topbar {
+				padding-top: calc(0.9rem + env(safe-area-inset-top));
+				padding-bottom: 0.9rem;
+			}
+
+			.topbar-inner {
+				flex-wrap: wrap;
+				row-gap: 0.3rem;
+				column-gap: 1.2rem;
+			}
+
+			.topbar-inner > a {
+				order: -1;
+				flex-basis: 100%;
+			}
+
+			.nav-link {
+				min-width: 0;
+				padding: 0.35rem 0.6rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="particles-js" aria-hidden="true"></div>
+
+	<header class="topbar" aria-label="Primary site navigation">
+		<div class="topbar-inner">
+			<nav class="menu menu-left" aria-label="Primary portfolio links left">
+				<a class="nav-link" href="./index.html#about">About Me</a>
+				<a class="nav-link" href="./teachingphilosophy.html">Teaching Philosophy</a>
+			</nav>
+
+			<a href="./index.html#hero" style="text-decoration: none; color: inherit;">
+				<h1 class="name">Aaron Battle</h1>
+			</a>
+
+			<nav class="menu menu-right" aria-label="Primary portfolio links right">
+				<a class="nav-link" href="./teachingexperience.html">Teaching Experience</a>
+				<a class="nav-link" href="./tuningdrone.html" aria-current="page">Tuning Drone</a>
+				<a class="nav-link" href="./index.html#contact">Contact</a>
+			</nav>
+		</div>
+	</header>
+
+	<main>
+		<section class="drone-page" aria-label="Tuning drone">
+			<section class="reveal">
+				<h1 class="hero-title">Tuning Drone</h1>
+				<p class="hero-subtitle">A steady tone to tune and play against. Pick a note and an octave and press play. It keeps sounding until you stop it, with no account and no time limit.</p>
+			</section>
+
+			<section class="drone reveal" aria-label="Drone controls">
+				<div class="readout">
+					<div>
+						<div class="readout-note" id="noteName" aria-live="polite">B♭<sub>3</sub></div>
+						<div class="readout-hz" id="noteHz">233.08 Hz</div>
+					</div>
+					<canvas class="wave" id="wave" aria-hidden="true"></canvas>
+					<button class="play" id="play" type="button" aria-pressed="false" aria-label="Play drone">
+						<svg class="i-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z" /></svg>
+						<svg class="i-stop" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2.5" /></svg>
+					</button>
+				</div>
+
+				<div>
+					<p class="label" id="notesLabel">Note</p>
+					<div class="notes" id="notes" role="group" aria-labelledby="notesLabel"></div>
+				</div>
+
+				<div class="row">
+					<div>
+						<p class="label" id="octLabel">Octave</p>
+						<div class="seg" id="octaves" role="group" aria-labelledby="octLabel"></div>
+					</div>
+					<div>
+						<p class="label" id="toneLabel">Tone</p>
+						<div class="seg" id="tones" role="group" aria-labelledby="toneLabel">
+							<button type="button" data-tone="sine" aria-pressed="true">Pure</button>
+							<button type="button" data-tone="warm" aria-pressed="false">Warm</button>
+						</div>
+					</div>
+					<div>
+						<p class="label"><label for="volume">Volume</label></p>
+						<input type="range" id="volume" min="0" max="100" value="60" />
+					</div>
+					<div>
+						<p class="label" id="refLabel">Tuned to A =</p>
+						<div class="stepper" role="group" aria-labelledby="refLabel">
+							<button type="button" id="refDown" aria-label="Lower A by 1 Hz">−</button>
+							<output id="refOut">440 Hz</output>
+							<button type="button" id="refUp" aria-label="Raise A by 1 Hz">+</button>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<p class="label">Add</p>
+					<div class="toggles">
+						<label class="toggle"><input type="checkbox" id="addFifth" /><span>The fifth above</span></label>
+						<label class="toggle"><input type="checkbox" id="addLow" /><span>The octave below</span></label>
+					</div>
+				</div>
+
+				<p class="hint">Pure is a plain sine wave. Warm adds a few soft overtones so low notes still come through laptop and Chromebook speakers. <kbd>Space</kbd> starts and stops, <kbd>←</kbd> <kbd>→</kbd> change the note, <kbd>↑</kbd> <kbd>↓</kbd> change the octave. On an iPhone, switch the ringer on if you hear nothing.</p>
+			</section>
+		</section>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+	<script>
+		if (window.tsParticles) tsParticles.load("particles-js", {
+			fpsLimit: 60,
+			particles: {
+				number: { value: 46, density: { enable: true, area: 900 } },
+				color: { value: ["#9aa5ff", "#63ddff", "#c7d0ff"] },
+				links: {
+					enable: true,
+					distance: 145,
+					color: "#8f9dff",
+					opacity: 0.16,
+					width: 1
+				},
+				move: {
+					enable: true,
+					speed: 0.75,
+					outModes: { default: "out" }
+				},
+				opacity: { value: { min: 0.16, max: 0.5 } },
+				size: { value: { min: 1, max: 2.5 } }
+			},
+			interactivity: {
+				events: {
+					onHover: { enable: true, mode: "repulse" },
+					resize: true
+				},
+				modes: {
+					repulse: { distance: 80, duration: 0.35 }
+				}
+			},
+			detectRetina: true,
+			background: { color: "transparent" }
+		});
+	</script>
+	<script>
+		// Scroll reveal
+		(function () {
+			const els = document.querySelectorAll(".reveal");
+			const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			if (!("IntersectionObserver" in window) || reduced) {
+				els.forEach((el) => el.classList.add("is-visible"));
+				return;
+			}
+			const io = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add("is-visible");
+						io.unobserve(entry.target);
+					}
+				});
+			}, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+			els.forEach((el) => io.observe(el));
+		})();
+	</script>
+	<script>
+		// The drone
+		(function () {
+			const NOTES = [
+				{ name: "C" },
+				{ name: "D♭", alt: "C♯" },
+				{ name: "D" },
+				{ name: "E♭", alt: "D♯" },
+				{ name: "E" },
+				{ name: "F" },
+				{ name: "G♭", alt: "F♯" },
+				{ name: "G" },
+				{ name: "A♭", alt: "G♯" },
+				{ name: "A" },
+				{ name: "B♭", alt: "A♯" },
+				{ name: "B" }
+			];
+			const OCTAVES = [1, 2, 3, 4, 5, 6];
+			const KEY = "tuningDrone.v1";
+
+			const state = { pc: 10, oct: 3, ref: 440, vol: 60, tone: "sine", fifth: false, low: false };
+			try {
+				const saved = JSON.parse(localStorage.getItem(KEY) || "null");
+				if (saved && typeof saved === "object") {
+					if (saved.pc >= 0 && saved.pc < 12) state.pc = saved.pc | 0;
+					if (OCTAVES.includes(saved.oct)) state.oct = saved.oct;
+					if (saved.ref >= 415 && saved.ref <= 466) state.ref = saved.ref | 0;
+					if (saved.vol >= 0 && saved.vol <= 100) state.vol = saved.vol | 0;
+					if (saved.tone === "sine" || saved.tone === "warm") state.tone = saved.tone;
+					state.fifth = !!saved.fifth;
+					state.low = !!saved.low;
+				}
+			} catch (e) {}
+			function save() {
+				try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+			}
+
+			const $ = (id) => document.getElementById(id);
+			const playBtn = $("play");
+			const notesEl = $("notes");
+			const octEl = $("octaves");
+			const volEl = $("volume");
+			const canvas = $("wave");
+			const g2d = canvas.getContext("2d");
+
+			// Frequency of a pitch class in an octave (scientific pitch: A4 = ref).
+			function freqOf(pc, oct, ref) {
+				const midi = 12 * (oct + 1) + pc;
+				return ref * Math.pow(2, (midi - 69) / 12);
+			}
+
+			// ── Audio ──
+			let ctx = null, master = null, analyser = null, warmWave = null;
+			let voices = [];
+			let playing = false;
+
+			function ensureAudio() {
+				if (ctx) return;
+				const AC = window.AudioContext || window.webkitAudioContext;
+				ctx = new AC();
+				// iOS: play through the ringer switch where the browser allows it.
+				try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+				master = ctx.createGain();
+				master.gain.value = volGain();
+				const comp = ctx.createDynamicsCompressor();
+				comp.threshold.value = -6;
+				comp.knee.value = 6;
+				comp.ratio.value = 6;
+				comp.attack.value = 0.005;
+				comp.release.value = 0.2;
+				analyser = ctx.createAnalyser();
+				analyser.fftSize = 2048;
+				master.connect(comp);
+				comp.connect(analyser);
+				analyser.connect(ctx.destination);
+				// Soft overtones for small speakers: 2nd to 5th harmonics, falling off.
+				const real = new Float32Array([0, 0, 0, 0, 0, 0]);
+				const imag = new Float32Array([0, 1, 0.42, 0.2, 0.09, 0.04]);
+				warmWave = ctx.createPeriodicWave(real, imag);
+			}
+
+			function volGain() {
+				const v = state.vol / 100;
+				return v * v * 0.9;
+			}
+
+			// The tones that should sound right now: [frequency, level].
+			function targets() {
+				const f = freqOf(state.pc, state.oct, state.ref);
+				const list = [[f, 1]];
+				if (state.fifth) list.push([f * Math.pow(2, 7 / 12), 0.6]);
+				if (state.low) list.push([f / 2, 0.75]);
+				const sum = list.reduce((s, t) => s + t[1], 0);
+				const scale = 0.5 / Math.max(1, sum * 0.8);
+				return list.map(([fr, lv]) => [fr, lv * scale]);
+			}
+
+			function makeVoice(freq, level, t) {
+				const osc = ctx.createOscillator();
+				if (state.tone === "warm") osc.setPeriodicWave(warmWave);
+				else osc.type = "sine";
+				osc.frequency.value = freq;
+				const g = ctx.createGain();
+				g.gain.setValueAtTime(0, t);
+				g.gain.setTargetAtTime(level, t, 0.04);
+				osc.connect(g);
+				g.connect(master);
+				osc.start(t);
+				return { osc, g };
+			}
+
+			function fadeOut(list, t) {
+				list.forEach((v) => {
+					v.g.gain.cancelScheduledValues(t);
+					v.g.gain.setTargetAtTime(0, t, 0.035);
+					v.osc.stop(t + 0.4);
+				});
+			}
+
+			// Crossfade from whatever is sounding to the current settings.
+			function sound() {
+				if (!playing) return;
+				const t = ctx.currentTime;
+				fadeOut(voices, t);
+				voices = targets().map(([f, lv]) => makeVoice(f, lv, t));
+			}
+
+			// Retune in place (A reference): a short glide, no restart.
+			function retune() {
+				if (!playing) return;
+				const t = ctx.currentTime;
+				const tg = targets();
+				if (tg.length !== voices.length) return sound();
+				voices.forEach((v, i) => v.osc.frequency.setTargetAtTime(tg[i][0], t, 0.03));
+			}
+
+			function start() {
+				ensureAudio();
+				if (ctx.state === "suspended") ctx.resume();
+				playing = true;
+				sound();
+				draw();
+				paintPlay();
+			}
+
+			function stop() {
+				if (!ctx) return;
+				playing = false;
+				fadeOut(voices, ctx.currentTime);
+				voices = [];
+				paintPlay();
+			}
+
+			function toggle() {
+				playing ? stop() : start();
+			}
+
+			// ── Waveform ──
+			let raf = 0;
+			const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			function sizeCanvas() {
+				const dpr = Math.min(window.devicePixelRatio || 1, 2);
+				const r = canvas.getBoundingClientRect();
+				canvas.width = Math.max(1, Math.round(r.width * dpr));
+				canvas.height = Math.max(1, Math.round(r.height * dpr));
+				if (!playing) idle();
+			}
+			function idle() {
+				const w = canvas.width, h = canvas.height;
+				g2d.clearRect(0, 0, w, h);
+				g2d.strokeStyle = "rgba(154, 164, 194, 0.35)";
+				g2d.lineWidth = Math.max(1, h / 64);
+				g2d.beginPath();
+				g2d.moveTo(0, h / 2);
+				g2d.lineTo(w, h / 2);
+				g2d.stroke();
+			}
+			const buf = new Float32Array(2048);
+			function draw() {
+				cancelAnimationFrame(raf);
+				clearTimeout(raf);
+				if (!analyser) return idle();
+				const w = canvas.width, h = canvas.height;
+				analyser.getFloatTimeDomainData(buf);
+				// Start on an upward zero crossing so the wave stands still.
+				let s = 0;
+				for (let i = 1; i < buf.length / 2; i++) {
+					if (buf[i - 1] < 0 && buf[i] >= 0) { s = i; break; }
+				}
+				const n = Math.min(buf.length - s, 900);
+				let peak = 0.02;
+				for (let i = s; i < s + n; i++) peak = Math.max(peak, Math.abs(buf[i]));
+				g2d.clearRect(0, 0, w, h);
+				const grad = g2d.createLinearGradient(0, 0, w, 0);
+				grad.addColorStop(0, "#7b8cff");
+				grad.addColorStop(1, "#63ddff");
+				g2d.strokeStyle = grad;
+				g2d.lineWidth = Math.max(1.5, h / 40);
+				g2d.lineJoin = "round";
+				g2d.beginPath();
+				for (let i = 0; i < n; i++) {
+					const x = (i / (n - 1)) * w;
+					const y = h / 2 - (buf[s + i] / peak) * h * 0.38;
+					i ? g2d.lineTo(x, y) : g2d.moveTo(x, y);
+				}
+				g2d.stroke();
+				// Reduced motion: a still picture refreshed twice a second instead of every frame.
+				if (playing) raf = reduced ? setTimeout(draw, 500) : requestAnimationFrame(draw);
+				else setTimeout(idle, 450);
+			}
+
+			// ── UI ──
+			function noteLabel() {
+				return NOTES[state.pc].name + "<sub>" + state.oct + "</sub>";
+			}
+
+			function paintReadout() {
+				$("noteName").innerHTML = noteLabel();
+				$("noteHz").textContent = freqOf(state.pc, state.oct, state.ref).toFixed(2) + " Hz";
+				$("refOut").textContent = state.ref + " Hz";
+				document.title = (playing ? NOTES[state.pc].name + state.oct + " · " : "") + "Tuning Drone | Aaron Battle";
+			}
+
+			function paintPlay() {
+				playBtn.classList.toggle("is-on", playing);
+				playBtn.setAttribute("aria-pressed", String(playing));
+				playBtn.setAttribute("aria-label", playing ? "Stop drone" : "Play drone");
+				paintReadout();
+			}
+
+			function paintButtons() {
+				notesEl.querySelectorAll(".note").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.pc === state.pc)));
+				octEl.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.oct === state.oct)));
+				$("tones").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tone === state.tone)));
+				$("addFifth").checked = state.fifth;
+				$("addLow").checked = state.low;
+				volEl.value = state.vol;
+				volEl.style.setProperty("--fill", state.vol + "%");
+				paintReadout();
+			}
+
+			NOTES.forEach((n, pc) => {
+				const b = document.createElement("button");
+				b.type = "button";
+				b.className = "note" + (n.alt ? " is-black" : "");
+				b.dataset.pc = pc;
+				b.setAttribute("aria-label", n.alt ? n.name + " or " + n.alt : n.name);
+				b.innerHTML = '<span class="note-main">' + n.name + "</span>" + (n.alt ? '<span class="note-alt">' + n.alt + "</span>" : "");
+				b.addEventListener("click", () => {
+					state.pc = pc;
+					save();
+					paintButtons();
+					// Picking a note is a request to hear it.
+					playing ? sound() : start();
+				});
+				notesEl.appendChild(b);
+			});
+
+			OCTAVES.forEach((o) => {
+				const b = document.createElement("button");
+				b.type = "button";
+				b.dataset.oct = o;
+				b.textContent = o;
+				b.setAttribute("aria-label", "Octave " + o);
+				b.addEventListener("click", () => setOctave(o));
+				octEl.appendChild(b);
+			});
+
+			function setOctave(o) {
+				if (!OCTAVES.includes(o) || o === state.oct) return;
+				state.oct = o;
+				save();
+				paintButtons();
+				sound();
+			}
+
+			function stepNote(d) {
+				let pc = state.pc + d, oct = state.oct;
+				if (pc > 11) { pc = 0; oct++; }
+				if (pc < 0) { pc = 11; oct--; }
+				if (!OCTAVES.includes(oct)) return;
+				state.pc = pc;
+				state.oct = oct;
+				save();
+				paintButtons();
+				sound();
+			}
+
+			$("tones").addEventListener("click", (e) => {
+				const b = e.target.closest("button");
+				if (!b || b.dataset.tone === state.tone) return;
+				state.tone = b.dataset.tone;
+				save();
+				paintButtons();
+				sound();
+			});
+
+			volEl.addEventListener("input", () => {
+				state.vol = +volEl.value;
+				volEl.style.setProperty("--fill", state.vol + "%");
+				if (master) master.gain.setTargetAtTime(volGain(), ctx.currentTime, 0.03);
+				save();
+			});
+
+			function setRef(r) {
+				state.ref = Math.max(415, Math.min(466, r));
+				save();
+				paintReadout();
+				retune();
+			}
+			$("refDown").addEventListener("click", () => setRef(state.ref - 1));
+			$("refUp").addEventListener("click", () => setRef(state.ref + 1));
+
+			$("addFifth").addEventListener("change", (e) => { state.fifth = e.target.checked; save(); sound(); });
+			$("addLow").addEventListener("change", (e) => { state.low = e.target.checked; save(); sound(); });
+
+			playBtn.addEventListener("click", toggle);
+
+			document.addEventListener("keydown", (e) => {
+				if (e.metaKey || e.ctrlKey || e.altKey) return;
+				const tag = e.target && e.target.tagName;
+				const onRange = tag === "INPUT" && e.target.type === "range";
+				const onCheck = tag === "INPUT" && e.target.type === "checkbox";
+				// Space is always start/stop, even after a note button was clicked (it keeps focus).
+				if (e.code === "Space" && !onCheck && tag !== "A") {
+					e.preventDefault();
+					if (!e.repeat) toggle();
+				} else if (!onRange && e.key === "ArrowRight") { e.preventDefault(); stepNote(1); }
+				else if (!onRange && e.key === "ArrowLeft") { e.preventDefault(); stepNote(-1); }
+				else if (!onRange && e.key === "ArrowUp") { e.preventDefault(); setOctave(state.oct + 1); }
+				else if (!onRange && e.key === "ArrowDown") { e.preventDefault(); setOctave(state.oct - 1); }
+			});
+
+			// A focused button also clicks on Space's keyup; that would undo the toggle above.
+			document.addEventListener("keyup", (e) => {
+				const t = e.target;
+				if (e.code === "Space" && t && t.tagName === "BUTTON") e.preventDefault();
+			});
+
+			// A context the browser suspended (another tab took the audio, a phone call) comes back on return.
+			document.addEventListener("visibilitychange", () => {
+				if (!document.hidden && playing && ctx && ctx.state !== "running") ctx.resume();
+			});
+
+			window.addEventListener("resize", sizeCanvas);
+			sizeCanvas();
+			paintButtons();
+			paintPlay();
+		})();
+	</script>
+
+	<footer>
+		<div class="footer-content">
+			<p class="footer-credit">Website Designed and Engineered by Aaron Battle</p>
+			<p class="footer-credit">Contact: battle.aaron.m@gmail.com</p>
+		</div>
+	</footer>
+</body>
+</html>
