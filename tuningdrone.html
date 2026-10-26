@@ -287,7 +287,7 @@
 		.keys {
 			position: relative;
 			display: flex;
-			height: 210px;
+			height: 300px;
 			padding: 10px 10px 12px;
 			border-radius: 16px;
 			background: linear-gradient(180deg, #11141f, #090b12);
@@ -326,8 +326,8 @@
 			position: absolute;
 			top: 10px;
 			z-index: 2;
-			width: calc((100% - 20px) / 7 * 0.6);
-			left: calc(10px + (100% - 20px) / 7 * (var(--at) - 0.3));
+			width: calc((100% - 20px) / var(--whites, 7) * 0.6);
+			left: calc(10px + (100% - 20px) / var(--whites, 7) * (var(--at) - 0.3));
 			height: 60%;
 			padding-bottom: 0.6rem;
 			border-radius: 0 0 7px 7px;
@@ -581,19 +581,26 @@
 			}
 
 			.keys {
-				height: 170px;
+				height: 220px;
 				padding: 8px 6px 10px;
 			}
 
 			.key-black {
 				top: 8px;
-				width: calc((100% - 12px) / 7 * 0.62);
-				left: calc(6px + (100% - 12px) / 7 * (var(--at) - 0.31));
+				width: calc((100% - 12px) / var(--whites, 7) * 0.62);
+				left: calc(6px + (100% - 12px) / var(--whites, 7) * (var(--at) - 0.31));
+				font-size: 0.6rem;
+				padding-bottom: 0.45rem;
+			}
+
+			.key-black .key-alt {
+				display: none;
 			}
 
 			.key-white {
-				margin: 0 1.5px;
-				font-size: 0.95rem;
+				margin: 0 1px;
+				padding-bottom: 0.7rem;
+				font-size: 0.72rem;
 			}
 
 			.row {
@@ -690,7 +697,7 @@
 		<section class="drone-page" aria-label="Tuning drone">
 			<section class="reveal">
 				<h1 class="hero-title">Tuning Drone</h1>
-				<p class="hero-subtitle">A steady tone to tune and play against. Pick a note and an octave and press play. It keeps sounding until you stop it, with no account and no time limit.</p>
+				<p class="hero-subtitle">A steady tone to tune and play against. Tap a note to start it. It keeps sounding until you stop it, with no account and no time limit.</p>
 			</section>
 
 			<section class="drone reveal" aria-label="Drone controls">
@@ -719,7 +726,7 @@
 					</div>
 				</div>
 
-				<p class="hint">A pure sine tone, tuned to A&nbsp;=&nbsp;440. <kbd>Space</kbd> starts and stops, <kbd>←</kbd> <kbd>→</kbd> change the note, <kbd>↑</kbd> <kbd>↓</kbd> change the octave. On an iPhone, switch the ringer on if you hear nothing.</p>
+				<p class="hint">A pure sine tone, tuned to A&nbsp;=&nbsp;440. Tap a key to start it and tap it again to stop. <kbd>Space</kbd> starts and stops, <kbd>←</kbd> <kbd>→</kbd> change the note, <kbd>↑</kbd> <kbd>↓</kbd> move the keyboard an octave. On an iPhone, switch the ringer on if you hear nothing.</p>
 			</section>
 		</section>
 	</main>
@@ -782,7 +789,7 @@
 	<script>
 		// The drone: one pure sine at A = 440.
 		(function () {
-			const NOTES = [
+			const NAMES = [
 				{ name: "C" },
 				{ name: "D♭", alt: "C♯" },
 				{ name: "D" },
@@ -796,17 +803,34 @@
 				{ name: "B♭", alt: "A♯" },
 				{ name: "B" }
 			];
-			const OCTAVES = [1, 2, 3, 4, 5, 6];
+			// The keyboard runs from the A just below a B♭ up to the D above the next B♭:
+			// the whole B♭ major scale and a little past it, B♭ at the left.
+			const SPAN = 18;
+			const BASES = [1, 2, 3, 4, 5]; // octave of the low B♭
 			const REF = 440;
-			const KEY = "tuningDrone.v1";
+			const KEY = "tuningDrone.v2";
 
-			const state = { pc: 10, oct: 3, vol: 60 };
+			const bflat = (base) => 12 * base + 22; // MIDI number of B♭ in that octave
+			const lowKey = (base) => bflat(base) - 1;
+			const inRange = (midi, base) => midi >= lowKey(base) && midi < lowKey(base) + SPAN;
+			const baseFor = (midi) => Math.max(BASES[0], Math.min(BASES[BASES.length - 1], Math.floor((midi - 22) / 12)));
+			const pcOf = (midi) => ((midi % 12) + 12) % 12;
+			const octOf = (midi) => Math.floor(midi / 12) - 1;
+
+			const state = { base: 3, midi: bflat(3), vol: 60 };
 			try {
 				const saved = JSON.parse(localStorage.getItem(KEY) || "null");
+				const old = JSON.parse(localStorage.getItem("tuningDrone.v1") || "null");
 				if (saved && typeof saved === "object") {
-					if (saved.pc >= 0 && saved.pc < 12) state.pc = saved.pc | 0;
-					if (OCTAVES.includes(saved.oct)) state.oct = saved.oct;
+					if (BASES.includes(saved.base)) state.base = saved.base;
+					if (inRange(saved.midi, state.base)) state.midi = saved.midi;
+					else state.midi = bflat(state.base);
 					if (saved.vol >= 0 && saved.vol <= 100) state.vol = saved.vol | 0;
+				} else if (old && typeof old === "object" && old.pc >= 0 && old.pc < 12 && old.oct >= 1 && old.oct <= 6) {
+					const m = 12 * (old.oct + 1) + (old.pc | 0);
+					state.base = baseFor(m);
+					state.midi = inRange(m, state.base) ? m : bflat(state.base);
+					if (old.vol >= 0 && old.vol <= 100) state.vol = old.vol | 0;
 				}
 			} catch (e) {}
 			function save() {
@@ -821,11 +845,7 @@
 			const canvas = $("wave");
 			const g2d = canvas.getContext("2d");
 
-			// Scientific pitch: A4 = 440.
-			function freqOf(pc, oct) {
-				const midi = 12 * (oct + 1) + pc;
-				return REF * Math.pow(2, (midi - 69) / 12);
-			}
+			const freqOf = (midi) => REF * Math.pow(2, (midi - 69) / 12);
 
 			// ── Audio ──
 			let ctx = null, master = null, analyser = null;
@@ -877,7 +897,7 @@
 				if (!playing) return;
 				const t = ctx.currentTime;
 				fadeOut(voice, t);
-				voice = makeVoice(freqOf(state.pc, state.oct), t);
+				voice = makeVoice(freqOf(state.midi), t);
 			}
 
 			function start() {
@@ -957,86 +977,105 @@
 
 			// ── UI ──
 			function paintReadout() {
-				$("noteName").innerHTML = NOTES[state.pc].name + "<sub>" + state.oct + "</sub>";
-				$("noteHz").textContent = freqOf(state.pc, state.oct).toFixed(2) + " Hz";
-				document.title = (playing ? NOTES[state.pc].name + state.oct + " · " : "") + "Tuning Drone | Aaron Battle";
+				const name = NAMES[pcOf(state.midi)].name, oct = octOf(state.midi);
+				$("noteName").innerHTML = name + "<sub>" + oct + "</sub>";
+				$("noteHz").textContent = freqOf(state.midi).toFixed(2) + " Hz";
+				document.title = (playing ? name + oct + " · " : "") + "Tuning Drone | Aaron Battle";
 			}
 
 			function paintPlay() {
 				playBtn.classList.toggle("is-on", playing);
 				playBtn.setAttribute("aria-pressed", String(playing));
 				playBtn.setAttribute("aria-label", playing ? "Stop drone" : "Play drone");
+				paintKeys();
+			}
+
+			// The lit key is the note that is sounding, or the one that will sound on Play.
+			function paintKeys() {
+				keysEl.querySelectorAll(".key").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.midi === state.midi)));
 				paintReadout();
 			}
 
-			function paintButtons() {
-				keysEl.querySelectorAll(".key").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.pc === state.pc)));
-				octEl.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.oct === state.oct)));
-				// The C key carries the octave number, like a printed keyboard.
-				const c = keysEl.querySelector('[data-pc="0"] .key-name');
-				if (c) c.textContent = "C" + state.oct;
-				volEl.value = state.vol;
-				volEl.style.setProperty("--fill", state.vol + "%");
-				paintReadout();
-			}
-
-			// A one-octave keyboard: seven white keys in a row, five black keys laid over the gaps.
-			let white = 0;
-			NOTES.forEach((n, pc) => {
-				const b = document.createElement("button");
-				b.type = "button";
-				b.dataset.pc = pc;
-				b.setAttribute("aria-label", n.alt ? n.name + " or " + n.alt : n.name);
-				if (n.alt) {
-					b.className = "key key-black";
-					// Centred on the line between the white key before it and the one after.
-					b.style.setProperty("--at", white);
-					b.innerHTML = '<span class="key-name">' + n.name + '</span><span class="key-alt">' + n.alt + "</span>";
-				} else {
-					b.className = "key key-white";
-					b.innerHTML = '<span class="key-name">' + n.name + "</span>";
-					white++;
+			// One button per key: the white keys in a row, the black keys laid over the gaps.
+			function buildKeys() {
+				keysEl.textContent = "";
+				let white = 0;
+				for (let i = 0; i < SPAN; i++) {
+					const midi = lowKey(state.base) + i;
+					const n = NAMES[pcOf(midi)], oct = octOf(midi);
+					const b = document.createElement("button");
+					b.type = "button";
+					b.dataset.midi = midi;
+					b.setAttribute("aria-label", (n.alt ? n.name + " or " + n.alt : n.name) + " " + oct);
+					if (n.alt) {
+						b.className = "key key-black";
+						b.style.setProperty("--at", white);
+						b.innerHTML = '<span class="key-name">' + n.name + '</span><span class="key-alt">' + n.alt + "</span>";
+					} else {
+						b.className = "key key-white";
+						// C carries its octave number, like a printed keyboard.
+						b.innerHTML = '<span class="key-name">' + n.name + (n.name === "C" ? oct : "") + "</span>";
+						white++;
+					}
+					b.addEventListener("click", () => pressKey(midi));
+					keysEl.appendChild(b);
 				}
-				b.addEventListener("click", () => {
-					state.pc = pc;
-					save();
-					paintButtons();
-					// Pressing a key is a request to hear it.
-					playing ? sound() : start();
-				});
-				keysEl.appendChild(b);
-			});
+				keysEl.style.setProperty("--whites", white);
+				paintKeys();
+			}
 
-			OCTAVES.forEach((o) => {
+			// A key starts the drone on that note, switches to it, or (pressed again) stops it.
+			function pressKey(midi) {
+				if (playing && midi === state.midi) return stop();
+				state.midi = midi;
+				save();
+				playing ? (sound(), paintKeys()) : start();
+			}
+
+			BASES.forEach((o) => {
 				const b = document.createElement("button");
 				b.type = "button";
-				b.dataset.oct = o;
-				b.textContent = o;
-				b.setAttribute("aria-label", "Octave " + o);
-				b.addEventListener("click", () => setOctave(o));
+				b.dataset.base = o;
+				b.textContent = "B♭" + o;
+				b.setAttribute("aria-label", "Keyboard from B♭" + o);
+				b.addEventListener("click", () => setBase(o));
 				octEl.appendChild(b);
 			});
 
-			function setOctave(o) {
-				if (!OCTAVES.includes(o) || o === state.oct) return;
-				state.oct = o;
+			function paintBases() {
+				octEl.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.base === state.base)));
+			}
+
+			// Moving the keyboard an octave moves the note with it.
+			function setBase(o) {
+				if (!BASES.includes(o) || o === state.base) return;
+				state.midi += 12 * (o - state.base);
+				state.base = o;
 				save();
-				paintButtons();
+				buildKeys();
+				paintBases();
 				sound();
 			}
 
 			function stepNote(d) {
-				let pc = state.pc + d, oct = state.oct;
-				if (pc > 11) { pc = 0; oct++; }
-				if (pc < 0) { pc = 11; oct--; }
-				if (!OCTAVES.includes(oct)) return;
-				state.pc = pc;
-				state.oct = oct;
+				const m = state.midi + d;
+				if (!inRange(m, state.base)) {
+					const b = baseFor(m);
+					if (!inRange(m, b)) return;
+					state.base = b;
+					state.midi = m;
+					buildKeys();
+					paintBases();
+				} else {
+					state.midi = m;
+					paintKeys();
+				}
 				save();
-				paintButtons();
 				sound();
 			}
 
+			volEl.value = state.vol;
+			volEl.style.setProperty("--fill", state.vol + "%");
 			volEl.addEventListener("input", () => {
 				state.vol = +volEl.value;
 				volEl.style.setProperty("--fill", state.vol + "%");
@@ -1056,8 +1095,8 @@
 					if (!e.repeat) toggle();
 				} else if (!onRange && e.key === "ArrowRight") { e.preventDefault(); stepNote(1); }
 				else if (!onRange && e.key === "ArrowLeft") { e.preventDefault(); stepNote(-1); }
-				else if (!onRange && e.key === "ArrowUp") { e.preventDefault(); setOctave(state.oct + 1); }
-				else if (!onRange && e.key === "ArrowDown") { e.preventDefault(); setOctave(state.oct - 1); }
+				else if (!onRange && e.key === "ArrowUp") { e.preventDefault(); setBase(state.base + 1); }
+				else if (!onRange && e.key === "ArrowDown") { e.preventDefault(); setBase(state.base - 1); }
 			});
 
 			// A focused button also clicks on the keyup of Space, which would undo the toggle above.
@@ -1073,7 +1112,8 @@
 
 			window.addEventListener("resize", sizeCanvas);
 			sizeCanvas();
-			paintButtons();
+			buildKeys();
+			paintBases();
 			paintPlay();
 		})();
 	</script>
